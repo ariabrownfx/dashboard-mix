@@ -23,7 +23,7 @@ export const Header: React.FC<HeaderProps> = ({ onToggleTheme, isDarkMode }) => 
             aria-label="User profile picture"
           />
           <h1 className="text-slate-800 dark:text-white text-xl font-bold leading-tight">
-            Dashboard
+            Dashboarders man
           </h1>
         </div>
         
