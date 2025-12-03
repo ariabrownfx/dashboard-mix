@@ -1,4 +1,5 @@
 
+
 export interface Investment {
   id: string;
   name: string;
@@ -85,9 +86,17 @@ export enum ViewType {
   TRADER_LOAN_APPLY = 'TraderLoanApply',
   TRADER_ESUSU = 'TraderEsusu',
   TRADER_LOAN_DETAIL = 'TraderLoanDetail',
+  TRADER_SAVINGS = 'TraderSavings',
+  TRADER_SAVINGS_CREATE = 'TraderSavingsCreate',
+  TRADER_SAVINGS_PLAN_DETAIL = 'TraderSavingsPlanDetail',
+
+  // Agent Specific
+  AGENT_TRADERS = 'AgentTraders',
+  AGENT_REPORTS = 'AgentReports',
+  AGENT_WALLET = 'AgentWallet',
 }
 
-export type ActivityType = 'deposit' | 'withdrawal' | 'investment' | 'payout' | 'yield' | 'repayment' | 'esusu_contribution';
+export type ActivityType = 'deposit' | 'withdrawal' | 'investment' | 'payout' | 'yield' | 'repayment' | 'esusu_contribution' | 'commission' | 'savings_deposit';
 
 export interface ActivityItem {
   id: string;
@@ -184,7 +193,7 @@ export interface UserProfile {
 
 // --- TRADER SPECIFIC ---
 
-export type UserRole = 'investor' | 'trader';
+export type UserRole = 'investor' | 'trader' | 'agent';
 
 export interface Loan {
     id: string;
@@ -211,6 +220,22 @@ export interface EsusuGroup {
     totalSaved: number;
 }
 
+export interface SavingsPlan {
+    id: string;
+    name: string;
+    targetAmount: number;
+    balance: number;
+    tenorDays: number; // 30, 90, 180, 360, 0 (Flexible)
+    interestRate: number; // PA
+    liquidityType: 'Locked' | 'Partial' | 'Flexible';
+    autoSaveEnabled: boolean;
+    contributionFrequency: 'Daily' | 'Weekly' | 'Market Day' | 'Custom';
+    startDate: string;
+    maturityDate: string;
+    nextDepositDate: string;
+    status: 'Active' | 'Completed' | 'Paused';
+}
+
 export interface TraderProfile {
     id: string;
     name: string;
@@ -222,6 +247,33 @@ export interface TraderProfile {
     walletBalance: number;
     activeLoan: Loan | null;
     esusuGroups: EsusuGroup[];
+    savingsPlans: SavingsPlan[];
+    activities: ActivityItem[];
+    onboardingSteps: OnboardingStep[];
+}
+
+// --- AGENT SPECIFIC ---
+
+export interface ManagedTrader {
+    id: string;
+    name: string;
+    businessName: string;
+    location: string;
+    status: 'Active' | 'Pending Verification' | 'Default Risk' | 'New';
+    loanStatus?: 'On Track' | 'Late' | 'No Loan';
+    lastVisit?: string;
+}
+
+export interface AgentProfile {
+    id: string;
+    name: string;
+    region: string;
+    email: string;
+    walletBalance: number; // Commission balance
+    commissionEarned: number;
+    tradersCount: number;
+    repaymentRate: number; // Percentage
+    managedTraders: ManagedTrader[];
     activities: ActivityItem[];
     onboardingSteps: OnboardingStep[];
 }

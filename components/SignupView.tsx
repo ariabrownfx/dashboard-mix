@@ -1,4 +1,6 @@
 
+
+
 import React, { useState } from 'react';
 import { Icon } from './Icon';
 import { UserRole } from '../types';
@@ -20,6 +22,9 @@ export const SignupView: React.FC<SignupViewProps> = ({ onSignup, onNavigateToLo
   const [businessName, setBusinessName] = useState('');
 
   const isTrader = role === 'trader';
+  const isAgent = role === 'agent';
+  const roleLabel = isAgent ? 'Agent' : isTrader ? 'Trader' : 'Investor';
+  const buttonColorClass = isAgent ? 'bg-purple-600 shadow-purple-500/30 hover:bg-purple-700' : isTrader ? 'bg-emerald-600 shadow-emerald-500/30 hover:bg-emerald-700' : 'bg-primary shadow-primary/30 hover:bg-primary/90';
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -41,9 +46,9 @@ export const SignupView: React.FC<SignupViewProps> = ({ onSignup, onNavigateToLo
           >
             <Icon name="arrow_back" />
           </button>
-          <h1 className="text-3xl font-bold text-slate-800 dark:text-white mb-2">Create {isTrader ? 'Trader' : 'Investor'} Account</h1>
+          <h1 className="text-3xl font-bold text-slate-800 dark:text-white mb-2">Create {roleLabel} Account</h1>
           <p className="text-slate-500 dark:text-slate-400">
-            {isTrader ? 'Grow your business with fair loans' : 'Start building your wealth today'}
+            {isAgent ? 'Start managing traders and field operations' : isTrader ? 'Grow your business with fair loans' : 'Start building your wealth today'}
           </p>
         </div>
 
@@ -128,7 +133,7 @@ export const SignupView: React.FC<SignupViewProps> = ({ onSignup, onNavigateToLo
           <button
             type="submit"
             disabled={isLoading}
-            className={`w-full py-4 rounded-xl font-bold text-white shadow-lg active:scale-[0.98] transition-all disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2 ${isTrader ? 'bg-emerald-600 shadow-emerald-500/30 hover:bg-emerald-700' : 'bg-primary shadow-primary/30 hover:bg-primary/90'}`}
+            className={`w-full py-4 rounded-xl font-bold text-white shadow-lg active:scale-[0.98] transition-all disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2 ${buttonColorClass}`}
           >
             {isLoading ? (
               <span className="size-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />

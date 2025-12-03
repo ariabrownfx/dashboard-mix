@@ -1,4 +1,6 @@
 
+
+
 import React from 'react';
 import { Icon } from './Icon';
 import { UserRole } from '../types';
@@ -56,6 +58,26 @@ export const RoleSelectionView: React.FC<RoleSelectionViewProps> = ({ onSelectRo
                 </p>
               </div>
               <div className="bg-slate-50 dark:bg-slate-700/50 rounded-full p-2 text-slate-400 group-hover:text-emerald-500 transition-colors">
+                <Icon name="arrow_forward" />
+              </div>
+            </div>
+          </button>
+
+          <button 
+            onClick={() => onSelectRole('agent')}
+            className="w-full group relative overflow-hidden bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-purple-500 dark:hover:border-purple-500 rounded-2xl p-6 text-left shadow-sm hover:shadow-lg transition-all duration-300"
+          >
+            <div className="flex items-start justify-between">
+              <div className="space-y-2 relative z-10">
+                <div className="size-12 rounded-xl bg-purple-50 dark:bg-purple-500/10 flex items-center justify-center text-purple-600 dark:text-purple-400 mb-2">
+                  <Icon name="admin_panel_settings" className="text-2xl" />
+                </div>
+                <h3 className="text-xl font-bold text-slate-800 dark:text-white">Agent</h3>
+                <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed max-w-[200px]">
+                  Onboard traders, monitor repayments, and manage field operations.
+                </p>
+              </div>
+              <div className="bg-slate-50 dark:bg-slate-700/50 rounded-full p-2 text-slate-400 group-hover:text-purple-500 transition-colors">
                 <Icon name="arrow_forward" />
               </div>
             </div>

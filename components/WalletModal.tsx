@@ -1,4 +1,5 @@
 
+
 import React, { useState } from 'react';
 import { Icon } from './Icon';
 
@@ -68,7 +69,7 @@ export const WalletModal: React.FC<WalletModalProps> = ({ isOpen, onClose, type 
               <button
                 key={amt}
                 type="button"
-                onClick={() => setAmount(amt === 'Max' ? '2450' : amt.toString())}
+                onClick={() => setAmount(amt === 'Max' ? '3400520' : amt.toString())}
                 className="flex-1 min-w-[60px] py-2 rounded-lg border border-slate-200 dark:border-slate-700 font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
               >
                 {amt === 'Max' ? 'Max' : `₦${amt}`}

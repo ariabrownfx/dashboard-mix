@@ -5,9 +5,10 @@ import { WalletModal } from './WalletModal';
 
 interface BalanceCardProps {
     compact?: boolean;
+    balance?: number;
 }
 
-export const BalanceCard: React.FC<BalanceCardProps> = ({ compact = false }) => {
+export const BalanceCard: React.FC<BalanceCardProps> = ({ compact = false, balance = 3400520 }) => {
   const [modalType, setModalType] = useState<'deposit' | 'withdraw' | null>(null);
   const [showBalance, setShowBalance] = useState(true);
 
@@ -48,7 +49,7 @@ export const BalanceCard: React.FC<BalanceCardProps> = ({ compact = false }) => 
                 </button>
               </div>
               <h2 className={`text-5xl font-sans font-extrabold tracking-tight transition-all duration-300 ${compact ? 'text-slate-800 dark:text-white' : 'text-white'}`}>
-                {showBalance ? '₦2,450.00' : '₦••••••••'}
+                {showBalance ? `₦${balance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : '₦••••••••'}
               </h2>
             </div>
             {!compact && (

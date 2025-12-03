@@ -1,4 +1,6 @@
 
+
+
 import React, { useState } from 'react';
 import { Icon } from './Icon';
 import { UserRole } from '../types';
@@ -27,6 +29,12 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLogin, onNavigateToSignu
   };
 
   const isTrader = role === 'trader';
+  const isAgent = role === 'agent';
+  const roleLabel = isAgent ? 'Agent' : isTrader ? 'Trader' : 'Investor';
+  const roleIcon = isAgent ? 'admin_panel_settings' : isTrader ? 'storefront' : 'savings';
+  const roleColorClass = isAgent ? 'bg-purple-100 dark:bg-purple-500/20 text-purple-600 dark:text-purple-400' : isTrader ? 'bg-emerald-100 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400' : 'bg-primary/10 text-primary';
+  const buttonColorClass = isAgent ? 'bg-purple-600 shadow-purple-500/30 hover:bg-purple-700' : isTrader ? 'bg-emerald-600 shadow-emerald-500/30 hover:bg-emerald-700' : 'bg-primary shadow-primary/30 hover:bg-primary/90';
+  const linkColorClass = isAgent ? 'text-purple-500' : isTrader ? 'text-emerald-500' : 'text-primary';
 
   return (
     <div className="flex flex-col min-h-screen px-6 py-10 bg-background-light dark:bg-background-dark animate-in fade-in duration-500">
@@ -37,14 +45,14 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLogin, onNavigateToSignu
                     <Icon name="arrow_back" className="text-sm" /> Switch Role
                 </button>
             )}
-          <div className={`inline-flex items-center justify-center size-16 rounded-2xl mb-6 ${isTrader ? 'bg-emerald-100 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400' : 'bg-primary/10 text-primary'}`}>
-            <Icon name={isTrader ? "storefront" : "savings"} className="text-4xl" />
+          <div className={`inline-flex items-center justify-center size-16 rounded-2xl mb-6 ${roleColorClass}`}>
+            <Icon name={roleIcon} className="text-4xl" />
           </div>
           <h1 className="text-3xl font-bold text-slate-800 dark:text-white mb-2">
-            {isTrader ? 'Trader Login' : 'Investor Login'}
+            {roleLabel} Login
           </h1>
           <p className="text-slate-500 dark:text-slate-400">
-            {isTrader ? 'Access your loans and savings' : 'Sign in to manage your portfolio'}
+            {isAgent ? 'Manage your traders and reports' : isTrader ? 'Access your loans and savings' : 'Sign in to manage your portfolio'}
           </p>
         </div>
 
@@ -98,7 +106,7 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLogin, onNavigateToSignu
           <button
             type="submit"
             disabled={isLoading}
-            className={`w-full py-4 rounded-xl font-bold text-white shadow-lg active:scale-[0.98] transition-all disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2 ${isTrader ? 'bg-emerald-600 shadow-emerald-500/30 hover:bg-emerald-700' : 'bg-primary shadow-primary/30 hover:bg-primary/90'}`}
+            className={`w-full py-4 rounded-xl font-bold text-white shadow-lg active:scale-[0.98] transition-all disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2 ${buttonColorClass}`}
           >
             {isLoading ? (
               <span className="size-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -116,9 +124,9 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLogin, onNavigateToSignu
             Don't have an account?{' '}
             <button 
               onClick={onNavigateToSignup}
-              className={`font-bold hover:underline ${isTrader ? 'text-emerald-500' : 'text-primary'}`}
+              className={`font-bold hover:underline ${linkColorClass}`}
             >
-              Register as {role === 'investor' ? 'Investor' : 'Trader'}
+              Register as {roleLabel}
             </button>
           </p>
         </div>

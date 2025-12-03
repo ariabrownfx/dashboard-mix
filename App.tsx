@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Header } from './components/Header';
 import { BottomNavigation } from './components/BottomNavigation';
@@ -29,10 +28,17 @@ import { RoleSelectionView } from './components/RoleSelectionView';
 import { TraderDashboardView } from './components/TraderDashboardView';
 import { LoanApplicationView } from './components/LoanApplicationView';
 import { EsusuView } from './components/EsusuView';
+import { TraderSavingsView } from './components/TraderSavingsView';
+import { CreateSavingsPlanView } from './components/CreateSavingsPlanView';
+import { SavingsPlanDetailView } from './components/SavingsPlanDetailView';
+// Agent Views
+import { AgentDashboardView } from './components/AgentDashboardView';
+import { AgentTraderManagementView } from './components/AgentTraderManagementView';
+import { AgentFieldReportView } from './components/AgentFieldReportView';
 
-import { ViewType, UserProfile, UserRole, TraderProfile } from './types';
+import { ViewType, UserProfile, UserRole, TraderProfile, AgentProfile } from './types';
 import { Icon } from './components/Icon';
-import { PROFILE_FRESH, PROFILE_STARTER, PROFILE_EXPERT, PROFILE_TRADER_NEW, PROFILE_TRADER_ACTIVE } from './constants';
+import { PROFILE_FRESH, PROFILE_STARTER, PROFILE_EXPERT, PROFILE_TRADER_NEW, PROFILE_TRADER_ACTIVE, PROFILE_AGENT, SAVINGS_PLANS } from './constants';
 
 const App: React.FC = () => {
   const [currentView, setCurrentView] = useState<ViewType>(ViewType.DASHBOARD);
@@ -47,10 +53,12 @@ const App: React.FC = () => {
   // Selection State
   const [selectedInvestmentId, setSelectedInvestmentId] = useState<string | null>(null);
   const [selectedTransactionId, setSelectedTransactionId] = useState<string | null>(null);
+  const [selectedPlanId, setSelectedPlanId] = useState<string | null>(null);
 
   // User State - Simulating Data Context
   const [userProfile, setUserProfile] = useState<UserProfile>(PROFILE_EXPERT);
   const [traderProfile, setTraderProfile] = useState<TraderProfile>(PROFILE_TRADER_ACTIVE);
+  const [agentProfile, setAgentProfile] = useState<AgentProfile>(PROFILE_AGENT);
 
   useEffect(() => {
     if (isDarkMode) {
@@ -72,6 +80,9 @@ const App: React.FC = () => {
     }
     if (view === ViewType.TRANSACTION_DETAIL && id) {
         setSelectedTransactionId(id);
+    }
+    if (view === ViewType.TRADER_SAVINGS_PLAN_DETAIL && id) {
+        setSelectedPlanId(id);
     }
   };
 
@@ -165,7 +176,7 @@ const App: React.FC = () => {
             case ViewType.AUTO_INVEST:
                 return <AutoInvestView onBack={handleBack} />;
             case ViewType.SECONDARY_MARKET:
-                return <SecondaryMarketView onBack={handleBack} />;
+                return <SecondaryMarketView onBack={handleBack} userTier={userProfile.tier} />;
             case ViewType.TIERS:
                 return <TiersView onBack={handleBack} currentTier={userProfile.tier} totalInvested={userProfile.totalInvested} />;
             case ViewType.IMPACT:
@@ -193,16 +204,56 @@ const App: React.FC = () => {
                 return <LoanApplicationView onBack={handleBack} />;
             case ViewType.TRADER_ESUSU:
                 return <EsusuView onBack={handleBack} />;
+            case ViewType.TRADER_SAVINGS:
+                return <TraderSavingsView onNavigate={navigateTo} traderProfile={traderProfile} />;
+            case ViewType.TRADER_SAVINGS_CREATE:
+                return <CreateSavingsPlanView onBack={handleBack} />;
+            case ViewType.TRADER_SAVINGS_PLAN_DETAIL:
+                const plan = traderProfile.savingsPlans.find(p => p.id === selectedPlanId);
+                return plan ? (
+                  <SavingsPlanDetailView plan={plan} onBack={handleBack} />
+                ) : (
+                  <TraderSavingsView onNavigate={navigateTo} traderProfile={traderProfile} />
+                );
             case ViewType.PROFILE:
                 // Reuse Profile View but adapted logic inside or pass trader props
-                // For MVP we reuse but ideally split. Using userProfile struct for compatibility for now
-                // Mapping traderProfile to userProfile shape for visual compatibility
                 const mappedProfile: UserProfile = {
                     ...userProfile,
                     name: traderProfile.name,
                     email: traderProfile.email,
                     walletBalance: traderProfile.walletBalance,
                     tier: 'Trader', // Override
+                };
+                return (
+                     <ProfileView 
+                        onLogout={() => { setIsAuthenticated(false); setUserRole(null); }} 
+                        onNavigate={navigateTo} 
+                        userProfile={mappedProfile}
+                        onSimulateProfile={simulateProfile}
+                    />
+                );
+        }
+    }
+
+    // --- AGENT FLOW ---
+    else if (userRole === 'agent') {
+        switch (currentView) {
+            case ViewType.DASHBOARD:
+                return <AgentDashboardView onNavigate={navigateTo} agentProfile={agentProfile} />;
+            case ViewType.AGENT_TRADERS:
+                return <AgentTraderManagementView onBack={() => navigateTo(ViewType.DASHBOARD)} agentProfile={agentProfile} />;
+            case ViewType.AGENT_REPORTS:
+                return <AgentFieldReportView onBack={() => navigateTo(ViewType.DASHBOARD)} />;
+            case ViewType.AGENT_WALLET:
+                // Reusing Activity View for now, could be specific Agent Wallet
+                return <ActivityView onNavigate={navigateTo} />;
+            case ViewType.PROFILE:
+                const mappedProfile: UserProfile = {
+                    ...userProfile,
+                    name: agentProfile.name,
+                    email: agentProfile.email,
+                    walletBalance: agentProfile.walletBalance,
+                    tier: 'Agent', // Override
                 };
                 return (
                      <ProfileView 
@@ -232,17 +283,20 @@ const App: React.FC = () => {
         case ViewType.LEARN:
             return <LearnView onBack={handleBack} />;
         case ViewType.TRANSACTION_DETAIL:
-            // Find in either profile
-            const activity = userProfile.activities.find(t => t.id === selectedTransactionId) || traderProfile.activities.find(t => t.id === selectedTransactionId);
+            // Find in any profile
+            const activity = userProfile.activities.find(t => t.id === selectedTransactionId) || 
+                             traderProfile.activities.find(t => t.id === selectedTransactionId) ||
+                             agentProfile.activities.find(t => t.id === selectedTransactionId);
             return activity ? (
                 <TransactionDetailView transaction={activity} onBack={handleBack} />
             ) : (
                 <ActivityView onNavigate={navigateTo} />
             );
         default:
-             return userRole === 'investor' 
-                ? <DashboardView onNavigate={navigateTo} userProfile={userProfile} />
-                : <TraderDashboardView onNavigate={navigateTo} traderProfile={traderProfile} />;
+             // Fallback default
+             if (userRole === 'agent') return <AgentDashboardView onNavigate={navigateTo} agentProfile={agentProfile} />;
+             if (userRole === 'trader') return <TraderDashboardView onNavigate={navigateTo} traderProfile={traderProfile} />;
+             return <DashboardView onNavigate={navigateTo} userProfile={userProfile} />;
     }
   };
 
@@ -263,15 +317,40 @@ const App: React.FC = () => {
     ViewType.TIERS,
     ViewType.IMPACT,
     ViewType.TRADER_LOAN_APPLY,
-    ViewType.TRADER_ESUSU
+    ViewType.TRADER_ESUSU,
+    ViewType.TRADER_SAVINGS_CREATE,
+    ViewType.TRADER_SAVINGS_PLAN_DETAIL,
+    ViewType.AGENT_TRADERS,
+    ViewType.AGENT_REPORTS
   ];
 
   const showBottomNav = !fullScreenViews.includes(currentView);
 
-  // Customize Bottom Nav for Trader
-  // We can pass different tabs based on role if we refactor BottomNavigation
-  // For now, we reuse it, but 'Explore' is Investor only. 
-  // TODO: Refactor BottomNavigation to accept tabs prop
+  // Define tabs based on role
+  let navTabs;
+  if (userRole === 'investor') {
+      navTabs = [
+        { id: ViewType.DASHBOARD, label: 'Home', icon: 'home' },
+        { id: ViewType.EXPLORE, label: 'Explore', icon: 'travel_explore' },
+        { id: ViewType.ACTIVITY, label: 'Activity', icon: 'history' },
+        { id: ViewType.PROFILE, label: 'Profile', icon: 'person' },
+      ];
+  } else if (userRole === 'trader') {
+      navTabs = [
+        { id: ViewType.DASHBOARD, label: 'Home', icon: 'home' },
+        { id: ViewType.TRADER_SAVINGS, label: 'Savings', icon: 'savings' },
+        { id: ViewType.TRADER_LOAN_APPLY, label: 'Loans', icon: 'request_quote' },
+        { id: ViewType.ACTIVITY, label: 'Activity', icon: 'history' },
+        { id: ViewType.PROFILE, label: 'Profile', icon: 'person' },
+      ];
+  } else if (userRole === 'agent') {
+      navTabs = [
+        { id: ViewType.DASHBOARD, label: 'Home', icon: 'home' },
+        { id: ViewType.AGENT_TRADERS, label: 'Traders', icon: 'groups' },
+        { id: ViewType.AGENT_REPORTS, label: 'Reports', icon: 'post_add' },
+        { id: ViewType.PROFILE, label: 'Profile', icon: 'person' },
+      ];
+  }
 
   return (
     <div className="relative w-full max-w-md mx-auto flex flex-col min-h-screen bg-background-light dark:bg-background-dark shadow-2xl overflow-hidden transition-colors duration-300">
@@ -284,56 +363,11 @@ const App: React.FC = () => {
       </main>
 
       {showBottomNav && (
-        <div className="fixed bottom-0 left-0 right-0 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 px-6 pb-safe pt-2 z-50 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
-            <div className="flex justify-between items-center max-w-md mx-auto h-14">
-                {/* Home */}
-                <button
-                    onClick={() => navigateTo(ViewType.DASHBOARD)}
-                    className={`flex flex-col items-center justify-center gap-1 w-16 transition-all duration-300 ${currentView === ViewType.DASHBOARD ? 'text-primary' : 'text-slate-400'}`}
-                >
-                    <Icon name="home" className="text-[26px]" />
-                    <span className="text-[10px] font-medium">Home</span>
-                </button>
-
-                {/* Explore (Investor Only) / Loan (Trader Only) */}
-                {userRole === 'investor' ? (
-                     <button
-                        onClick={() => navigateTo(ViewType.EXPLORE)}
-                        className={`flex flex-col items-center justify-center gap-1 w-16 transition-all duration-300 ${currentView === ViewType.EXPLORE ? 'text-primary' : 'text-slate-400'}`}
-                    >
-                        <Icon name="travel_explore" className="text-[26px]" />
-                        <span className="text-[10px] font-medium">Explore</span>
-                    </button>
-                ) : (
-                    <button
-                        onClick={() => navigateTo(ViewType.TRADER_LOAN_APPLY)}
-                        className={`flex flex-col items-center justify-center gap-1 w-16 transition-all duration-300 ${currentView === ViewType.TRADER_LOAN_APPLY ? 'text-primary' : 'text-slate-400'}`}
-                    >
-                        <Icon name="request_quote" className="text-[26px]" />
-                        <span className="text-[10px] font-medium">Loans</span>
-                    </button>
-                )}
-
-                {/* Activity */}
-                <button
-                    onClick={() => navigateTo(ViewType.ACTIVITY)}
-                    className={`flex flex-col items-center justify-center gap-1 w-16 transition-all duration-300 ${currentView === ViewType.ACTIVITY ? 'text-primary' : 'text-slate-400'}`}
-                >
-                    <Icon name="history" className="text-[26px]" />
-                    <span className="text-[10px] font-medium">Activity</span>
-                </button>
-
-                {/* Profile */}
-                <button
-                    onClick={() => navigateTo(ViewType.PROFILE)}
-                    className={`flex flex-col items-center justify-center gap-1 w-16 transition-all duration-300 ${currentView === ViewType.PROFILE ? 'text-primary' : 'text-slate-400'}`}
-                >
-                    <Icon name="person" className="text-[26px]" />
-                    <span className="text-[10px] font-medium">Profile</span>
-                </button>
-            </div>
-            <div className="h-4 w-full" /> 
-        </div>
+        <BottomNavigation 
+            currentView={currentView} 
+            onChange={navigateTo} 
+            tabs={navTabs}
+        />
       )}
     </div>
   );

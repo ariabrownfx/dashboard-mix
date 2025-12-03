@@ -1,4 +1,5 @@
 
+
 import React from 'react';
 import { StatsSection } from './StatsSection';
 import { EarningsChart } from './EarningsChart';
@@ -19,7 +20,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onNavigate, userPr
 
   return (
     <div className="flex flex-col gap-6 animate-in fade-in duration-500">
-      <BalanceCard />
+      <BalanceCard balance={userProfile.walletBalance} />
       
       {/* Show Onboarding Widget if not complete */}
       {!isOnboardingComplete ? (

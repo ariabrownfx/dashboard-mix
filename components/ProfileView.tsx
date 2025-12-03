@@ -1,4 +1,5 @@
 
+
 import React, { useState } from 'react';
 import { Icon } from './Icon';
 import { PROFILE_IMAGE_URL } from '../constants';
@@ -61,7 +62,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onLogout, onNavigate, 
         </button>
       </div>
 
-      <BalanceCard compact />
+      <BalanceCard compact balance={userProfile.walletBalance} />
 
       {/* Menu Options */}
       <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700/50 overflow-hidden shadow-sm">

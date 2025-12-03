@@ -1,5 +1,9 @@
 
-import { ChartDataPoint, Investment, Collection, Cluster, ActivityItem, Notification, PaymentMethod, FinancialGoal, UserProfile, CollectionUpdate, MarketListing, TierLevel, ImpactMetric, TraderProfile, Loan, EsusuGroup, ViewType } from "./types";
+
+
+
+
+import { ChartDataPoint, Investment, Collection, Cluster, ActivityItem, Notification, PaymentMethod, FinancialGoal, UserProfile, CollectionUpdate, MarketListing, TierLevel, ImpactMetric, TraderProfile, Loan, EsusuGroup, ViewType, AgentProfile, ManagedTrader, SavingsPlan } from "./types";
 
 // --- BASE DATA ---
 
@@ -432,7 +436,7 @@ export const PROFILE_EXPERT: UserProfile = {
     email: 'alex.johnson@example.com',
     tier: 'Gold',
     joinDate: 'Jan 15, 2023',
-    walletBalance: 2450.00,
+    walletBalance: 3400520.00,
     totalInvested: 125430.00,
     totalEarnings: 15880.00,
     activeInvestmentsCount: 12,
@@ -487,6 +491,39 @@ export const ESUSU_GROUPS: EsusuGroup[] = [
     }
 ];
 
+export const SAVINGS_PLANS: SavingsPlan[] = [
+    {
+        id: 'sp1',
+        name: 'Shop Rent 2024',
+        targetAmount: 500000,
+        balance: 125000,
+        tenorDays: 180,
+        interestRate: 12.0,
+        liquidityType: 'Locked',
+        autoSaveEnabled: true,
+        contributionFrequency: 'Weekly',
+        startDate: 'Sep 01, 2023',
+        maturityDate: 'Feb 28, 2024',
+        nextDepositDate: 'Oct 15, 2023',
+        status: 'Active'
+    },
+    {
+        id: 'sp2',
+        name: 'New Generator',
+        targetAmount: 150000,
+        balance: 45000,
+        tenorDays: 0,
+        interestRate: 6.0,
+        liquidityType: 'Flexible',
+        autoSaveEnabled: false,
+        contributionFrequency: 'Daily',
+        startDate: 'Oct 01, 2023',
+        maturityDate: 'N/A',
+        nextDepositDate: 'Oct 14, 2023',
+        status: 'Active'
+    }
+];
+
 export const PROFILE_TRADER_NEW: TraderProfile = {
     id: 'trader_new',
     name: 'Chinedu Okeke',
@@ -498,6 +535,7 @@ export const PROFILE_TRADER_NEW: TraderProfile = {
     walletBalance: 0,
     activeLoan: null,
     esusuGroups: [],
+    savingsPlans: [],
     activities: [],
     onboardingSteps: [
         { id: 't1', label: 'Complete KYC', isCompleted: false, action: ViewType.KYC, icon: 'badge' },
@@ -517,15 +555,43 @@ export const PROFILE_TRADER_ACTIVE: TraderProfile = {
     walletBalance: 12500,
     activeLoan: ACTIVE_LOAN,
     esusuGroups: ESUSU_GROUPS,
+    savingsPlans: SAVINGS_PLANS,
     activities: [
         { id: 'ta1', type: 'repayment', title: 'Daily Loan Repayment', description: 'Computer Village Hub', amount: -1833, date: 'Today, 9:00 AM', status: 'completed' },
-        { id: 'ta2', type: 'esusu_contribution', title: 'Esusu Contribution', description: 'Lagos Traders Circle', amount: -5000, date: 'Today, 8:30 AM', status: 'completed' }
+        { id: 'ta2', type: 'esusu_contribution', title: 'Esusu Contribution', description: 'Lagos Traders Circle', amount: -5000, date: 'Today, 8:30 AM', status: 'completed' },
+        { id: 'ta3', type: 'savings_deposit', title: 'Savings Deposit', description: 'Shop Rent 2024', amount: -2500, date: 'Yesterday', status: 'completed' }
     ],
     onboardingSteps: [
          { id: 't1', label: 'Complete KYC', isCompleted: true, action: ViewType.KYC, icon: 'badge' },
          { id: 't2', label: 'Join a Collection', isCompleted: true, action: ViewType.TRADER_LOAN_APPLY, icon: 'storefront' },
          { id: 't3', label: 'Apply for First Loan', isCompleted: true, action: ViewType.TRADER_LOAN_APPLY, icon: 'request_quote' }
     ]
+};
+
+// --- AGENT DATA ---
+
+export const MANAGED_TRADERS: ManagedTrader[] = [
+    { id: 't1', name: 'Bisi Adebayo', businessName: 'Bisi Textiles', location: 'Lagos, Nigeria', status: 'Active', loanStatus: 'On Track', lastVisit: '2 days ago' },
+    { id: 't2', name: 'Chinedu Okeke', businessName: 'Okeke Electronics', location: 'Lagos, Nigeria', status: 'Pending Verification', lastVisit: 'Today' },
+    { id: 't3', name: 'Emmanuel Eze', businessName: 'Eze Hardware', location: 'Ojo, Lagos', status: 'Active', loanStatus: 'Late', lastVisit: '5 days ago' },
+    { id: 't4', name: 'Grace Ojo', businessName: 'Grace Foods', location: 'Ikeja, Lagos', status: 'Active', loanStatus: 'On Track', lastVisit: '1 week ago' },
+];
+
+export const PROFILE_AGENT: AgentProfile = {
+    id: 'agent_01',
+    name: 'Agent Michael',
+    region: 'Lagos Mainland',
+    email: 'agent.michael@mix.com',
+    walletBalance: 45000,
+    commissionEarned: 125000,
+    tradersCount: 15,
+    repaymentRate: 94.5,
+    managedTraders: MANAGED_TRADERS,
+    activities: [
+        { id: 'aa1', type: 'commission', title: 'Verification Bonus', description: 'Verified Chinedu Okeke', amount: 5000, date: 'Today, 11:30 AM', status: 'completed' },
+        { id: 'aa2', type: 'commission', title: 'Repayment Commission', description: 'Bisi Textiles - Weekly', amount: 450, date: 'Yesterday', status: 'completed' }
+    ],
+    onboardingSteps: []
 };
 
 export const INVESTMENTS = EXPERT_INVESTMENTS; 
