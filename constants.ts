@@ -1,8 +1,5 @@
 
 
-
-
-
 import { ChartDataPoint, Investment, Collection, Cluster, ActivityItem, Notification, PaymentMethod, FinancialGoal, UserProfile, CollectionUpdate, MarketListing, TierLevel, ImpactMetric, TraderProfile, Loan, EsusuGroup, ViewType, AgentProfile, ManagedTrader, SavingsPlan } from "./types";
 
 // --- BASE DATA ---
@@ -380,6 +377,39 @@ const EXPERT_CHART_DATA: ChartDataPoint[] = [
   { day: 'Thu', value: 140 }, { day: 'Fri', value: 70 }, { day: 'Sat', value: 180 }, { day: 'Sun', value: 130 },
 ];
 
+const INVESTOR_SAVINGS_PLANS: SavingsPlan[] = [
+    {
+        id: 'sp1',
+        name: 'Emergency Fund',
+        targetAmount: 100000,
+        balance: 55000,
+        tenorDays: 0,
+        interestRate: 8.0,
+        liquidityType: 'Flexible',
+        autoSaveEnabled: true,
+        contributionFrequency: 'Monthly',
+        startDate: 'Aug 15, 2023',
+        maturityDate: 'N/A',
+        nextDepositDate: 'Oct 15, 2023',
+        status: 'Active'
+    },
+    {
+        id: 'sp2',
+        name: 'Fixed Deposit (90 Days)',
+        targetAmount: 50000,
+        balance: 50000,
+        tenorDays: 90,
+        interestRate: 14.5,
+        liquidityType: 'Locked',
+        autoSaveEnabled: false,
+        contributionFrequency: 'Custom',
+        startDate: 'Sep 01, 2023',
+        maturityDate: 'Nov 30, 2023',
+        nextDepositDate: 'N/A',
+        status: 'Active'
+    }
+];
+
 // 1. FRESH USER (New Signup)
 export const PROFILE_FRESH: UserProfile = {
     id: 'fresh_01',
@@ -395,6 +425,7 @@ export const PROFILE_FRESH: UserProfile = {
     activities: [],
     goals: [],
     chartData: [],
+    savingsPlans: [],
     onboardingSteps: [
         { id: 's1', label: 'Verify Identity', isCompleted: false, action: ViewType.KYC, icon: 'badge' },
         { id: 's2', label: 'Add Payment Method', isCompleted: false, action: ViewType.PAYMENT_METHODS, icon: 'credit_card' },
@@ -421,6 +452,7 @@ export const PROFILE_STARTER: UserProfile = {
         { day: 'Mon', value: 0 }, { day: 'Tue', value: 0 }, { day: 'Wed', value: 2 },
         { day: 'Thu', value: 4 }, { day: 'Fri', value: 5 }, { day: 'Sat', value: 5 }, { day: 'Sun', value: 6 },
     ],
+    savingsPlans: [],
     onboardingSteps: [
         { id: 's1', label: 'Verify Identity', isCompleted: true, action: ViewType.KYC, icon: 'badge' },
         { id: 's2', label: 'Add Payment Method', isCompleted: true, action: ViewType.PAYMENT_METHODS, icon: 'credit_card' },
@@ -444,6 +476,7 @@ export const PROFILE_EXPERT: UserProfile = {
     activities: EXPERT_ACTIVITIES,
     goals: EXPERT_GOALS,
     chartData: EXPERT_CHART_DATA,
+    savingsPlans: INVESTOR_SAVINGS_PLANS,
     onboardingSteps: [
         { id: 's1', label: 'Verify Identity', isCompleted: true, action: ViewType.KYC, icon: 'badge' },
         { id: 's2', label: 'Add Payment Method', isCompleted: true, action: ViewType.PAYMENT_METHODS, icon: 'credit_card' },

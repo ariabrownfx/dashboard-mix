@@ -88,6 +88,15 @@ export const BalanceCard: React.FC<BalanceCardProps> = ({ compact = false, balan
         </div>
       </div>
 
+      {!compact && (
+        <div className="flex items-center justify-center gap-1.5 mt-2.5 px-4 opacity-70">
+           <Icon name="verified_user" className="text-[12px] text-slate-500 dark:text-slate-400 shrink-0" />
+           <p className="text-[10px] font-medium text-slate-500 dark:text-slate-400 text-center whitespace-nowrap overflow-hidden text-ellipsis">
+             All savings and investment are insured by <span className="font-bold">NDIC</span> and regulated by the <span className="font-bold">CBN</span>.
+           </p>
+        </div>
+      )}
+
       <WalletModal 
         isOpen={!!modalType} 
         onClose={() => setModalType(null)} 
