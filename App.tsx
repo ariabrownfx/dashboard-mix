@@ -15,7 +15,6 @@ import { TransactionDetailView } from './components/TransactionDetailView';
 import { SecondaryMarketView } from './components/SecondaryMarketView';
 import { TiersView } from './components/TiersView';
 import { ImpactProfileView } from './components/ImpactProfileView';
-import { InvestorSavingsView } from './components/InvestorSavingsView';
 // Common Views
 import { LoginView } from './components/LoginView';
 import { SignupView } from './components/SignupView';
@@ -84,7 +83,7 @@ const App: React.FC = () => {
     if (view === ViewType.TRANSACTION_DETAIL && id) {
         setSelectedTransactionId(id);
     }
-    if ((view === ViewType.TRADER_SAVINGS_PLAN_DETAIL || view === ViewType.INVESTOR_SAVINGS_DETAIL) && id) {
+    if (view === ViewType.TRADER_SAVINGS_PLAN_DETAIL && id) {
         setSelectedPlanId(id);
     }
   };
@@ -110,6 +109,11 @@ const App: React.FC = () => {
               setTraderProfile(PROFILE_TRADER_ACTIVE);
               break;
       }
+      navigateTo(ViewType.DASHBOARD);
+  };
+
+  const switchRole = (newRole: UserRole) => {
+      setUserRole(newRole);
       navigateTo(ViewType.DASHBOARD);
   };
 
@@ -172,6 +176,8 @@ const App: React.FC = () => {
                         onNavigate={navigateTo} 
                         userProfile={userProfile}
                         onSimulateProfile={simulateProfile}
+                        onSwitchRole={switchRole}
+                        currentRole="investor"
                     />
                 );
             case ViewType.ANALYTICS:
@@ -190,17 +196,6 @@ const App: React.FC = () => {
                     <ActiveInvestmentDetailView investment={investment} onBack={handleBack} />
                 ) : (
                     <DashboardView onNavigate={navigateTo} userProfile={userProfile} />
-                );
-            case ViewType.INVESTOR_SAVINGS:
-                return <InvestorSavingsView onNavigate={navigateTo} userProfile={userProfile} />;
-            case ViewType.INVESTOR_SAVINGS_CREATE:
-                return <CreateSavingsPlanView onBack={handleBack} />;
-            case ViewType.INVESTOR_SAVINGS_DETAIL:
-                const plan = userProfile.savingsPlans.find(p => p.id === selectedPlanId);
-                return plan ? (
-                    <SavingsPlanDetailView plan={plan} onBack={handleBack} />
-                ) : (
-                    <InvestorSavingsView onNavigate={navigateTo} userProfile={userProfile} />
                 );
             // ... Common views shared below
         }
@@ -244,6 +239,8 @@ const App: React.FC = () => {
                         onNavigate={navigateTo} 
                         userProfile={mappedProfile}
                         onSimulateProfile={simulateProfile}
+                        onSwitchRole={switchRole}
+                        currentRole="trader"
                     />
                 );
         }
@@ -275,6 +272,8 @@ const App: React.FC = () => {
                         onNavigate={navigateTo} 
                         userProfile={mappedProfile}
                         onSimulateProfile={simulateProfile}
+                        onSwitchRole={switchRole}
+                        currentRole="agent"
                     />
                 );
         }
@@ -322,7 +321,7 @@ const App: React.FC = () => {
     ViewType.SECURITY, 
     ViewType.NOTIFICATIONS_SETTINGS,
     ViewType.HELP, 
-    ViewType.REFERRAL,
+    ViewType.REFERRAL, 
     ViewType.LEARN,
     ViewType.INVESTMENT_DETAIL,
     ViewType.AUTO_INVEST,
@@ -334,8 +333,6 @@ const App: React.FC = () => {
     ViewType.TRADER_ESUSU,
     ViewType.TRADER_SAVINGS_CREATE,
     ViewType.TRADER_SAVINGS_PLAN_DETAIL,
-    ViewType.INVESTOR_SAVINGS_CREATE,
-    ViewType.INVESTOR_SAVINGS_DETAIL,
     ViewType.AGENT_TRADERS,
     ViewType.AGENT_REPORTS
   ];
@@ -348,7 +345,6 @@ const App: React.FC = () => {
       navTabs = [
         { id: ViewType.DASHBOARD, label: 'Home', icon: 'home' },
         { id: ViewType.EXPLORE, label: 'Explore', icon: 'travel_explore' },
-        { id: ViewType.INVESTOR_SAVINGS, label: 'Savings', icon: 'savings' },
         { id: ViewType.ACTIVITY, label: 'Activity', icon: 'history' },
         { id: ViewType.PROFILE, label: 'Profile', icon: 'person' },
       ];

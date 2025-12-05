@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Icon } from './Icon';
 
@@ -134,7 +135,7 @@ export const CreateSavingsPlanView: React.FC<CreateSavingsPlanViewProps> = ({ on
                  <section>
                     <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2 block">Contribution Frequency</label>
                     <div className="grid grid-cols-2 gap-3">
-                        {['Daily', 'Weekly', 'Monthly', 'Market Day'].map(f => (
+                        {['Daily', 'Weekly', 'Market Day', 'Custom'].map(f => (
                             <button 
                                 key={f}
                                 onClick={() => setFrequency(f)}
@@ -178,7 +179,7 @@ export const CreateSavingsPlanView: React.FC<CreateSavingsPlanViewProps> = ({ on
                         <div>
                             <p className="font-bold text-sm text-amber-900 dark:text-amber-100 mb-1">Auto-Save Enabled</p>
                             <p className="text-xs text-amber-800 dark:text-amber-200 leading-relaxed">
-                                We will automatically deduct ₦{(Number(targetAmount) / (tenor / (frequency === 'Daily' ? 1 : frequency === 'Weekly' ? 7 : 30))).toLocaleString(undefined, { maximumFractionDigits: 0 })} {frequency.toLowerCase()} from your wallet.
+                                We will automatically deduct ₦{(Number(targetAmount) / (tenor / (frequency === 'Daily' ? 1 : 7))).toLocaleString(undefined, { maximumFractionDigits: 0 })} {frequency.toLowerCase()} from your wallet.
                             </p>
                         </div>
                     </div>
