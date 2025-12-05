@@ -1,5 +1,3 @@
-
-
 export interface Investment {
   id: string;
   name: string;
@@ -81,6 +79,9 @@ export enum ViewType {
   SECONDARY_MARKET = 'SecondaryMarket',
   TIERS = 'Tiers',
   IMPACT = 'Impact',
+  INVESTOR_SAVINGS = 'InvestorSavings',
+  INVESTOR_SAVINGS_CREATE = 'InvestorSavingsCreate',
+  INVESTOR_SAVINGS_DETAIL = 'InvestorSavingsDetail',
 
   // Trader Specific
   TRADER_LOAN_APPLY = 'TraderLoanApply',
@@ -174,6 +175,22 @@ export interface ImpactMetric {
     color: string;
 }
 
+export interface SavingsPlan {
+    id: string;
+    name: string;
+    targetAmount: number;
+    balance: number;
+    tenorDays: number; // 30, 90, 180, 360, 0 (Flexible)
+    interestRate: number; // PA
+    liquidityType: 'Locked' | 'Partial' | 'Flexible';
+    autoSaveEnabled: boolean;
+    contributionFrequency: 'Daily' | 'Weekly' | 'Monthly' | 'Market Day' | 'Custom';
+    startDate: string;
+    maturityDate: string;
+    nextDepositDate: string;
+    status: 'Active' | 'Completed' | 'Paused';
+}
+
 export interface UserProfile {
     id: string;
     name: string;
@@ -189,6 +206,7 @@ export interface UserProfile {
     goals: FinancialGoal[];
     chartData: ChartDataPoint[];
     onboardingSteps: OnboardingStep[];
+    savingsPlans: SavingsPlan[];
 }
 
 // --- TRADER SPECIFIC ---
@@ -218,22 +236,6 @@ export interface EsusuGroup {
     myPosition: number; // e.g., 3rd to collect
     payoutDate: string;
     totalSaved: number;
-}
-
-export interface SavingsPlan {
-    id: string;
-    name: string;
-    targetAmount: number;
-    balance: number;
-    tenorDays: number; // 30, 90, 180, 360, 0 (Flexible)
-    interestRate: number; // PA
-    liquidityType: 'Locked' | 'Partial' | 'Flexible';
-    autoSaveEnabled: boolean;
-    contributionFrequency: 'Daily' | 'Weekly' | 'Market Day' | 'Custom';
-    startDate: string;
-    maturityDate: string;
-    nextDepositDate: string;
-    status: 'Active' | 'Completed' | 'Paused';
 }
 
 export interface TraderProfile {

@@ -4,25 +4,16 @@ import React, { useState } from 'react';
 import { Icon } from './Icon';
 import { PROFILE_IMAGE_URL } from '../constants';
 import { BalanceCard } from './BalanceCard';
-import { ViewType, UserProfile, UserRole } from '../types';
+import { ViewType, UserProfile } from '../types';
 
 interface ProfileViewProps {
   onLogout?: () => void;
   onNavigate?: (view: ViewType) => void;
   userProfile: UserProfile;
   onSimulateProfile: (type: 'fresh' | 'starter' | 'expert') => void;
-  onSwitchRole?: (role: UserRole) => void;
-  currentRole?: UserRole;
 }
 
-export const ProfileView: React.FC<ProfileViewProps> = ({ 
-    onLogout, 
-    onNavigate, 
-    userProfile, 
-    onSimulateProfile,
-    onSwitchRole,
-    currentRole
-}) => {
+export const ProfileView: React.FC<ProfileViewProps> = ({ onLogout, onNavigate, userProfile, onSimulateProfile }) => {
   const [showDemoOptions, setShowDemoOptions] = useState(false);
 
   const menuItems = [
@@ -70,27 +61,6 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
             <Icon name="chevron_right" className="text-sm" />
         </button>
       </div>
-
-      {/* Role Switcher */}
-      {onSwitchRole && currentRole && (
-        <div className="px-1">
-            <button 
-                onClick={() => onSwitchRole(currentRole === 'investor' ? 'trader' : 'investor')}
-                className="w-full flex items-center gap-4 p-4 bg-gradient-to-r from-slate-800 to-slate-900 dark:from-slate-700 dark:to-slate-800 rounded-2xl text-white shadow-lg shadow-slate-500/10 hover:shadow-slate-500/20 hover:scale-[1.01] active:scale-[0.99] transition-all"
-            >
-                <div className={`size-12 rounded-xl flex items-center justify-center shadow-inner ${currentRole === 'investor' ? 'bg-emerald-500 text-white' : 'bg-primary text-white'}`}>
-                    <Icon name={currentRole === 'investor' ? 'storefront' : 'trending_up'} className="text-2xl" />
-                </div>
-                <div className="flex-1 text-left">
-                    <p className="text-xs text-slate-400 font-bold uppercase tracking-wider mb-0.5">Switch Dashboard</p>
-                    <p className="font-bold text-lg leading-tight">Go to {currentRole === 'investor' ? 'Trader' : 'Investor'} View</p>
-                </div>
-                <div className="bg-white/10 p-2 rounded-full">
-                    <Icon name="arrow_forward" />
-                </div>
-            </button>
-        </div>
-      )}
 
       <BalanceCard compact balance={userProfile.walletBalance} />
 
@@ -163,7 +133,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
       </div>
 
       <div className="text-center pb-8">
-        <p className="text-xs text-slate-400">Version 2.4.2 (Build 2047)</p>
+        <p className="text-xs text-slate-400">Version 2.4.1 (Build 2046)</p>
       </div>
     </div>
   );
