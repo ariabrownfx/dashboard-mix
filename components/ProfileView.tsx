@@ -1,5 +1,6 @@
 
 
+
 import React, { useState } from 'react';
 import { Icon } from './Icon';
 import { PROFILE_IMAGE_URL } from '../constants';
@@ -16,6 +17,9 @@ interface ProfileViewProps {
 export const ProfileView: React.FC<ProfileViewProps> = ({ onLogout, onNavigate, userProfile, onSimulateProfile }) => {
   const [showDemoOptions, setShowDemoOptions] = useState(false);
 
+  // Check if Tax Profile exists to determine navigation target
+  const taxAction = userProfile.taxProfile ? ViewType.TAX_DASHBOARD : ViewType.TAX_PROFILE;
+
   const menuItems = [
     { 
         icon: 'verified_user', 
@@ -23,6 +27,13 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onLogout, onNavigate, 
         sub: userProfile.id === 'fresh_01' ? 'Not Started' : 'Tier 1 - Verified', 
         action: () => onNavigate && onNavigate(ViewType.KYC),
         badge: userProfile.id === 'fresh_01' ? 'Action Required' : undefined
+    },
+    { 
+        icon: 'gavel', 
+        label: 'TaxDesk', 
+        sub: 'Automated Tax & Filing', 
+        action: () => onNavigate && onNavigate(taxAction),
+        badge: 'New'
     },
     { icon: 'person', label: 'Personal Information', sub: 'Name, Email, Phone', action: () => {} },
     { icon: 'account_balance_wallet', label: 'Payment Methods', sub: 'Bank Accounts, Cards', action: () => onNavigate && onNavigate(ViewType.PAYMENT_METHODS) },
@@ -83,7 +94,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onLogout, onNavigate, 
             </div>
             <div className="flex items-center gap-2">
                 {item.badge && (
-                    <span className="text-[10px] font-bold bg-rose-500 text-white px-2 py-0.5 rounded-full">{item.badge}</span>
+                    <span className="text-[10px] font-bold bg-primary text-white px-2 py-0.5 rounded-full">{item.badge}</span>
                 )}
                 <Icon name="chevron_right" className="text-slate-400" />
             </div>

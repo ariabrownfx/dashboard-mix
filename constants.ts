@@ -1,6 +1,7 @@
 
 
-import { ChartDataPoint, Investment, Collection, Cluster, ActivityItem, Notification, PaymentMethod, FinancialGoal, UserProfile, CollectionUpdate, MarketListing, TierLevel, ImpactMetric, TraderProfile, Loan, EsusuGroup, ViewType, AgentProfile, ManagedTrader, SavingsPlan } from "./types";
+
+import { ChartDataPoint, Investment, Collection, Cluster, ActivityItem, Notification, PaymentMethod, FinancialGoal, UserProfile, CollectionUpdate, MarketListing, TierLevel, ImpactMetric, TraderProfile, Loan, EsusuGroup, ViewType, AgentProfile, ManagedTrader, SavingsPlan, TaxProfile, TaxTransaction, TaxFiling } from "./types";
 
 // --- BASE DATA ---
 
@@ -410,6 +411,30 @@ const INVESTOR_SAVINGS_PLANS: SavingsPlan[] = [
     }
 ];
 
+// --- TAX MOCK DATA ---
+
+export const TAX_PROFILE_MOCK: TaxProfile = {
+    countryCode: 'NG',
+    taxId: '23894021-0001',
+    businessType: 'Sole Prop',
+    vatRegistered: true,
+    accountingBasis: 'Cash',
+    optInAutoFile: true
+};
+
+export const TAX_TRANSACTIONS_MOCK: TaxTransaction[] = [
+    { id: 'tx1', date: 'Oct 12, 2023', description: 'Sales - Electronics Batch A', amount: 450000, category: 'Sales', taxable: true, vatAmount: 33750, status: 'Auto-Classified', hasInvoice: true },
+    { id: 'tx2', date: 'Oct 10, 2023', description: 'Shop Rent Payment', amount: -150000, category: 'Expense', taxable: false, vatAmount: 0, status: 'Verified', hasInvoice: true },
+    { id: 'tx3', date: 'Oct 08, 2023', description: 'Generator Fuel', amount: -15000, category: 'Expense', taxable: true, vatAmount: 1125, status: 'Review Needed', hasInvoice: false },
+    { id: 'tx4', date: 'Oct 05, 2023', description: 'Sales - Repairs Service', amount: 25000, category: 'Sales', taxable: true, vatAmount: 1875, status: 'Auto-Classified', hasInvoice: true },
+];
+
+export const TAX_FILINGS_MOCK: TaxFiling[] = [
+    { id: 'f1', period: 'Sep 2023', taxType: 'VAT', amountDue: 45200, status: 'Filed', dateFiled: 'Oct 20, 2023' },
+    { id: 'f2', period: 'Aug 2023', taxType: 'VAT', amountDue: 38500, status: 'Filed', dateFiled: 'Sep 18, 2023' },
+    { id: 'f3', period: 'Q3 2023', taxType: 'Income', amountDue: 125000, status: 'Draft' },
+];
+
 // 1. FRESH USER (New Signup)
 export const PROFILE_FRESH: UserProfile = {
     id: 'fresh_01',
@@ -482,7 +507,8 @@ export const PROFILE_EXPERT: UserProfile = {
         { id: 's2', label: 'Add Payment Method', isCompleted: true, action: ViewType.PAYMENT_METHODS, icon: 'credit_card' },
         { id: 's3', label: 'Make First Deposit', isCompleted: true, action: ViewType.DASHBOARD, icon: 'account_balance_wallet' },
         { id: 's4', label: 'Invest in a Cluster', isCompleted: true, action: ViewType.EXPLORE, icon: 'rocket_launch' },
-    ]
+    ],
+    taxProfile: TAX_PROFILE_MOCK // Expert has tax profile set up
 };
 
 // --- TRADER DATA ---
@@ -598,7 +624,8 @@ export const PROFILE_TRADER_ACTIVE: TraderProfile = {
          { id: 't1', label: 'Complete KYC', isCompleted: true, action: ViewType.KYC, icon: 'badge' },
          { id: 't2', label: 'Join a Collection', isCompleted: true, action: ViewType.TRADER_LOAN_APPLY, icon: 'storefront' },
          { id: 't3', label: 'Apply for First Loan', isCompleted: true, action: ViewType.TRADER_LOAN_APPLY, icon: 'request_quote' }
-    ]
+    ],
+    taxProfile: TAX_PROFILE_MOCK // Trader also has tax profile
 };
 
 // --- AGENT DATA ---

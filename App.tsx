@@ -1,5 +1,6 @@
 
 
+
 import React, { useState, useEffect } from 'react';
 import { Header } from './components/Header';
 import { BottomNavigation } from './components/BottomNavigation';
@@ -38,6 +39,11 @@ import { SavingsPlanDetailView } from './components/SavingsPlanDetailView';
 import { AgentDashboardView } from './components/AgentDashboardView';
 import { AgentTraderManagementView } from './components/AgentTraderManagementView';
 import { AgentFieldReportView } from './components/AgentFieldReportView';
+// TaxDesk Views
+import { TaxProfileView } from './components/TaxProfileView';
+import { TaxDashboardView } from './components/TaxDashboardView';
+import { TaxFilingView } from './components/TaxFilingView';
+import { TaxAdminView } from './components/TaxAdminView';
 
 import { ViewType, UserProfile, UserRole, TraderProfile, AgentProfile } from './types';
 import { Icon } from './components/Icon';
@@ -237,6 +243,7 @@ const App: React.FC = () => {
                     email: traderProfile.email,
                     walletBalance: traderProfile.walletBalance,
                     tier: 'Trader', // Override
+                    taxProfile: traderProfile.taxProfile
                 };
                 return (
                      <ProfileView 
@@ -306,6 +313,14 @@ const App: React.FC = () => {
             ) : (
                 <ActivityView onNavigate={navigateTo} />
             );
+        case ViewType.TAX_PROFILE:
+            return <TaxProfileView onBack={handleBack} onNavigate={navigateTo} />;
+        case ViewType.TAX_DASHBOARD:
+            return <TaxDashboardView onBack={handleBack} onNavigate={navigateTo} />;
+        case ViewType.TAX_FILING:
+            return <TaxFilingView onBack={handleBack} onNavigate={navigateTo} />;
+        case ViewType.TAX_ADMIN:
+            return <TaxAdminView onBack={handleBack} />;
         default:
              // Fallback default
              if (userRole === 'agent') return <AgentDashboardView onNavigate={navigateTo} agentProfile={agentProfile} />;
@@ -337,7 +352,11 @@ const App: React.FC = () => {
     ViewType.INVESTOR_SAVINGS_CREATE,
     ViewType.INVESTOR_SAVINGS_DETAIL,
     ViewType.AGENT_TRADERS,
-    ViewType.AGENT_REPORTS
+    ViewType.AGENT_REPORTS,
+    ViewType.TAX_PROFILE,
+    ViewType.TAX_DASHBOARD,
+    ViewType.TAX_FILING,
+    ViewType.TAX_ADMIN
   ];
 
   const showBottomNav = !fullScreenViews.includes(currentView);

@@ -1,3 +1,4 @@
+
 export interface Investment {
   id: string;
   name: string;
@@ -95,6 +96,12 @@ export enum ViewType {
   AGENT_TRADERS = 'AgentTraders',
   AGENT_REPORTS = 'AgentReports',
   AGENT_WALLET = 'AgentWallet',
+
+  // TaxDesk
+  TAX_PROFILE = 'TaxProfile',
+  TAX_DASHBOARD = 'TaxDashboard',
+  TAX_FILING = 'TaxFiling',
+  TAX_ADMIN = 'TaxAdmin',
 }
 
 export type ActivityType = 'deposit' | 'withdrawal' | 'investment' | 'payout' | 'yield' | 'repayment' | 'esusu_contribution' | 'commission' | 'savings_deposit';
@@ -191,6 +198,38 @@ export interface SavingsPlan {
     status: 'Active' | 'Completed' | 'Paused';
 }
 
+// --- TAX DESK ---
+
+export interface TaxProfile {
+    countryCode: string;
+    taxId: string;
+    businessType: 'Individual' | 'Sole Prop' | 'Company';
+    vatRegistered: boolean;
+    accountingBasis: 'Cash' | 'Accrual';
+    optInAutoFile: boolean;
+}
+
+export interface TaxTransaction {
+    id: string;
+    date: string;
+    description: string;
+    amount: number;
+    category: 'Sales' | 'Expense' | 'Asset' | 'Cost of Sales';
+    taxable: boolean;
+    vatAmount: number;
+    status: 'Auto-Classified' | 'Review Needed' | 'Verified';
+    hasInvoice: boolean;
+}
+
+export interface TaxFiling {
+    id: string;
+    period: string; // e.g. "Oct 2023"
+    taxType: 'VAT' | 'Income' | 'WHT';
+    amountDue: number;
+    status: 'Draft' | 'Filed' | 'Failed';
+    dateFiled?: string;
+}
+
 export interface UserProfile {
     id: string;
     name: string;
@@ -207,6 +246,7 @@ export interface UserProfile {
     chartData: ChartDataPoint[];
     onboardingSteps: OnboardingStep[];
     savingsPlans: SavingsPlan[];
+    taxProfile?: TaxProfile;
 }
 
 // --- TRADER SPECIFIC ---
@@ -252,6 +292,7 @@ export interface TraderProfile {
     savingsPlans: SavingsPlan[];
     activities: ActivityItem[];
     onboardingSteps: OnboardingStep[];
+    taxProfile?: TaxProfile;
 }
 
 // --- AGENT SPECIFIC ---
