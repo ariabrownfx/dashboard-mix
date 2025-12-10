@@ -1,6 +1,5 @@
 
-
-
+// ... (imports remain same)
 import { ChartDataPoint, Investment, Collection, Cluster, ActivityItem, Notification, PaymentMethod, FinancialGoal, UserProfile, CollectionUpdate, MarketListing, TierLevel, ImpactMetric, TraderProfile, Loan, EsusuGroup, ViewType, AgentProfile, ManagedTrader, SavingsPlan, TaxProfile, TaxTransaction, TaxFiling } from "./types";
 
 // --- BASE DATA ---
@@ -271,7 +270,8 @@ export const NOTIFICATIONS: Notification[] = [
 
 export const MOCK_PAYMENT_METHODS: PaymentMethod[] = [
   { id: 'pm1', type: 'bank', name: 'Chase Checking', mask: '**** 8823', status: 'active', icon: 'account_balance' },
-  { id: 'pm2', type: 'card', name: 'Visa Debit', mask: '**** 4242', status: 'active', icon: 'credit_card' }
+  { id: 'pm2', type: 'card', name: 'Visa Debit', mask: '**** 4242', status: 'active', icon: 'credit_card' },
+  { id: 'pm3', type: 'card', name: 'Mastercard Gold', mask: '**** 8899', status: 'active', icon: 'credit_card' }
 ];
 
 export const MARKET_LISTINGS: MarketListing[] = [

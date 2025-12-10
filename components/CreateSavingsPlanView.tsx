@@ -1,6 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Icon } from './Icon';
+import { MOCK_PAYMENT_METHODS } from '../constants';
 
 interface CreateSavingsPlanViewProps {
   onBack: () => void;
@@ -13,6 +14,10 @@ export const CreateSavingsPlanView: React.FC<CreateSavingsPlanViewProps> = ({ on
   const [tenor, setTenor] = useState(90);
   const [frequency, setFrequency] = useState('Weekly');
   const [targetAmount, setTargetAmount] = useState('');
+  
+  // Payment State
+  const [paymentMethod, setPaymentMethod] = useState<'wallet' | 'card'>('wallet');
+  const [selectedCardId, setSelectedCardId] = useState<string>('');
 
   // Reset interest payout preference if liquidity is not locked
   useEffect(() => {
@@ -20,6 +25,14 @@ export const CreateSavingsPlanView: React.FC<CreateSavingsPlanViewProps> = ({ on
         setInterestPayout('Maturity');
     }
   }, [liquidity]);
+
+  // Set default card if available
+  useEffect(() => {
+      const cards = MOCK_PAYMENT_METHODS.filter(pm => pm.type === 'card');
+      if (cards.length > 0 && !selectedCardId) {
+          setSelectedCardId(cards[0].id);
+      }
+  }, []);
 
   const getInterestRate = (days: number, liq: string) => {
       let base = 8;
@@ -32,6 +45,8 @@ export const CreateSavingsPlanView: React.FC<CreateSavingsPlanViewProps> = ({ on
 
   const currentRate = getInterestRate(tenor, liquidity);
   const calculatedInterest = ((Number(targetAmount) || 0) * (currentRate/100) * (tenor/365));
+
+  const availableCards = MOCK_PAYMENT_METHODS.filter(pm => pm.type === 'card');
 
   return (
     <div className="fixed inset-0 z-[60] bg-background-light dark:bg-background-dark flex flex-col animate-in slide-in-from-right duration-300">
@@ -209,22 +224,75 @@ export const CreateSavingsPlanView: React.FC<CreateSavingsPlanViewProps> = ({ on
                 <section>
                     <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2 block">Payment Method</label>
                     <div className="space-y-3">
-                         <div className="p-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 flex items-center justify-between">
+                         {/* Wallet Option */}
+                         <div 
+                             onClick={() => setPaymentMethod('wallet')}
+                             className={`p-4 rounded-xl border flex items-center justify-between cursor-pointer transition-all ${
+                                 paymentMethod === 'wallet' 
+                                 ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-500/10 ring-1 ring-emerald-500' 
+                                 : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:border-slate-300'
+                             }`}
+                         >
                              <div className="flex items-center gap-3">
                                  <Icon name="account_balance_wallet" className="text-slate-500" />
-                                 <span className="font-bold text-slate-800 dark:text-white">Wallet Balance</span>
+                                 <div>
+                                     <span className="font-bold text-slate-800 dark:text-white block text-sm">Wallet Balance</span>
+                                     <span className="text-[10px] text-slate-500">Available: ₦3,400,520.00</span>
+                                 </div>
                              </div>
-                             <div className="size-5 rounded-full border-2 border-emerald-500 flex items-center justify-center">
-                                 <div className="size-2.5 rounded-full bg-emerald-500" />
+                             <div className={`size-5 rounded-full border-2 flex items-center justify-center ${paymentMethod === 'wallet' ? 'border-emerald-500' : 'border-slate-300'}`}>
+                                 {paymentMethod === 'wallet' && <div className="size-2.5 rounded-full bg-emerald-500" />}
                              </div>
                          </div>
-                         <div className="p-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 flex items-center justify-between opacity-50">
+
+                         {/* Card Option */}
+                         <div 
+                             onClick={() => setPaymentMethod('card')}
+                             className={`p-4 rounded-xl border flex items-center justify-between cursor-pointer transition-all ${
+                                 paymentMethod === 'card' 
+                                 ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-500/10 ring-1 ring-emerald-500' 
+                                 : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:border-slate-300'
+                             }`}
+                         >
                              <div className="flex items-center gap-3">
                                  <Icon name="credit_card" className="text-slate-500" />
-                                 <span className="font-bold text-slate-800 dark:text-white">Debit Card</span>
+                                 <span className="font-bold text-slate-800 dark:text-white text-sm">Debit Card</span>
                              </div>
-                             <div className="size-5 rounded-full border-2 border-slate-300" />
+                             <div className={`size-5 rounded-full border-2 flex items-center justify-center ${paymentMethod === 'card' ? 'border-emerald-500' : 'border-slate-300'}`}>
+                                 {paymentMethod === 'card' && <div className="size-2.5 rounded-full bg-emerald-500" />}
+                             </div>
                          </div>
+
+                         {/* Card Selection Dropdown */}
+                         {paymentMethod === 'card' && (
+                            <div className="pl-4 ml-4 border-l-2 border-slate-200 dark:border-slate-700 space-y-2 animate-in slide-in-from-top-2 max-h-48 overflow-y-auto pr-1 custom-scrollbar">
+                                {availableCards.length > 0 ? (
+                                    availableCards.map(card => (
+                                        <div 
+                                            key={card.id}
+                                            onClick={() => setSelectedCardId(card.id)}
+                                            className={`p-3 rounded-lg border flex items-center gap-3 cursor-pointer transition-all ${
+                                                selectedCardId === card.id
+                                                ? 'bg-slate-800 dark:bg-white text-white dark:text-slate-900 border-transparent shadow-lg'
+                                                : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700'
+                                            }`}
+                                        >
+                                            <Icon name={card.icon} />
+                                            <div className="flex-1">
+                                                <p className="text-sm font-bold">{card.name}</p>
+                                                <p className="text-[10px] opacity-80">{card.mask}</p>
+                                            </div>
+                                            {selectedCardId === card.id && <Icon name="check_circle" className="text-emerald-400 dark:text-emerald-600" />}
+                                        </div>
+                                    ))
+                                ) : (
+                                    <p className="text-xs text-slate-500 italic p-2">No cards available.</p>
+                                )}
+                                <button className="flex items-center gap-2 text-xs font-bold text-primary px-2 py-2 hover:bg-primary/5 rounded-lg w-full transition-colors">
+                                    <Icon name="add" className="text-sm" /> Add New Card
+                                </button>
+                            </div>
+                         )}
                     </div>
                 </section>
                 
