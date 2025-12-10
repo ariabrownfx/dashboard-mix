@@ -293,6 +293,11 @@ export interface TraderProfile {
     activities: ActivityItem[];
     onboardingSteps: OnboardingStep[];
     taxProfile?: TaxProfile;
+    assignedAgent?: {
+        name: string;
+        phone: string;
+        photo: string;
+    };
 }
 
 // --- AGENT SPECIFIC ---

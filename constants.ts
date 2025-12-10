@@ -600,7 +600,12 @@ export const PROFILE_TRADER_NEW: TraderProfile = {
         { id: 't1', label: 'Complete KYC', isCompleted: false, action: ViewType.KYC, icon: 'badge' },
         { id: 't2', label: 'Join a Collection', isCompleted: false, action: ViewType.TRADER_LOAN_APPLY, icon: 'storefront' },
         { id: 't3', label: 'Apply for First Loan', isCompleted: false, action: ViewType.TRADER_LOAN_APPLY, icon: 'request_quote' }
-    ]
+    ],
+    assignedAgent: {
+        name: "Agent Michael",
+        phone: "+234 800 123 4567",
+        photo: "https://picsum.photos/seed/agent1/200/200"
+    }
 };
 
 export const PROFILE_TRADER_ACTIVE: TraderProfile = {
@@ -625,7 +630,12 @@ export const PROFILE_TRADER_ACTIVE: TraderProfile = {
          { id: 't2', label: 'Join a Collection', isCompleted: true, action: ViewType.TRADER_LOAN_APPLY, icon: 'storefront' },
          { id: 't3', label: 'Apply for First Loan', isCompleted: true, action: ViewType.TRADER_LOAN_APPLY, icon: 'request_quote' }
     ],
-    taxProfile: TAX_PROFILE_MOCK // Trader also has tax profile
+    taxProfile: TAX_PROFILE_MOCK, // Trader also has tax profile
+    assignedAgent: {
+        name: "Agent Michael",
+        phone: "+234 800 123 4567",
+        photo: "https://picsum.photos/seed/agent1/200/200"
+    }
 };
 
 // --- AGENT DATA ---

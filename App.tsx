@@ -1,6 +1,4 @@
 
-
-
 import React, { useState, useEffect } from 'react';
 import { Header } from './components/Header';
 import { BottomNavigation } from './components/BottomNavigation';
@@ -251,6 +249,7 @@ const App: React.FC = () => {
                         onNavigate={navigateTo} 
                         userProfile={mappedProfile}
                         onSimulateProfile={simulateProfile}
+                        assignedAgent={traderProfile.assignedAgent}
                     />
                 );
         }

@@ -1,6 +1,4 @@
 
-
-
 import React, { useState } from 'react';
 import { Icon } from './Icon';
 import { PROFILE_IMAGE_URL } from '../constants';
@@ -12,9 +10,14 @@ interface ProfileViewProps {
   onNavigate?: (view: ViewType) => void;
   userProfile: UserProfile;
   onSimulateProfile: (type: 'fresh' | 'starter' | 'expert') => void;
+  assignedAgent?: {
+      name: string;
+      phone: string;
+      photo: string;
+  };
 }
 
-export const ProfileView: React.FC<ProfileViewProps> = ({ onLogout, onNavigate, userProfile, onSimulateProfile }) => {
+export const ProfileView: React.FC<ProfileViewProps> = ({ onLogout, onNavigate, userProfile, onSimulateProfile, assignedAgent }) => {
   const [showDemoOptions, setShowDemoOptions] = useState(false);
 
   // Check if Tax Profile exists to determine navigation target
@@ -74,6 +77,32 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onLogout, onNavigate, 
       </div>
 
       <BalanceCard compact balance={userProfile.walletBalance} />
+
+      {/* My Agent Card (If applicable) */}
+      {assignedAgent && (
+          <div className="bg-white dark:bg-slate-800 rounded-2xl p-4 border border-slate-100 dark:border-slate-700/50 shadow-sm flex items-center gap-4">
+              <div className="relative">
+                  <div 
+                      className="size-14 rounded-full bg-cover bg-center bg-slate-200 dark:bg-slate-700" 
+                      style={{ backgroundImage: `url(${assignedAgent.photo})` }}
+                  />
+                  <div className="absolute bottom-0 right-0 size-4 bg-emerald-500 border-2 border-white dark:border-slate-800 rounded-full"></div>
+              </div>
+              <div className="flex-1">
+                  <p className="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wide mb-0.5">Your Field Agent</p>
+                  <h3 className="font-bold text-slate-800 dark:text-white">{assignedAgent.name}</h3>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">Available Mon-Sat</p>
+              </div>
+              <div className="flex gap-2">
+                  <button className="size-9 rounded-full bg-emerald-100 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center hover:bg-emerald-200 dark:hover:bg-emerald-500/30 transition-colors">
+                      <Icon name="call" className="text-lg" />
+                  </button>
+                  <button className="size-9 rounded-full bg-blue-100 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400 flex items-center justify-center hover:bg-blue-200 dark:hover:bg-blue-500/30 transition-colors">
+                      <Icon name="chat" className="text-lg" />
+                  </button>
+              </div>
+          </div>
+      )}
 
       {/* Menu Options */}
       <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700/50 overflow-hidden shadow-sm">
@@ -144,7 +173,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onLogout, onNavigate, 
       </div>
 
       <div className="text-center pb-8">
-        <p className="text-xs text-slate-400">Version 2.4.1 (Build 2046)</p>
+        <p className="text-xs text-slate-400">Version 2.4.2 (Build 2047)</p>
       </div>
     </div>
   );
