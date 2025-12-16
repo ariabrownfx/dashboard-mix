@@ -23,7 +23,7 @@ export const LoanDetailView: React.FC<LoanDetailViewProps> = ({ loan, onBack }) 
         </h1>
       </header>
 
-      <div className="flex-1 overflow-y-auto pb-24">
+      <div className="flex-1 overflow-y-auto pb-6">
         {/* Summary Card */}
         <div className="p-6 bg-gradient-to-br from-emerald-600 to-teal-700 text-white mb-6">
            <div className="flex items-center justify-between mb-6">
@@ -35,6 +35,11 @@ export const LoanDetailView: React.FC<LoanDetailViewProps> = ({ loan, onBack }) 
                     <Icon name="verified_user" className="text-2xl" />
                 </div>
            </div>
+
+           <button className="w-full py-3 bg-white text-emerald-700 font-bold rounded-xl shadow-lg mb-6 hover:bg-emerald-50 transition-colors flex items-center justify-center gap-2">
+                <Icon name="payments" />
+                <span>Pay Now</span>
+           </button>
 
            <div className="grid grid-cols-2 gap-4 bg-black/10 rounded-xl p-4 border border-white/10">
                <div>
@@ -124,17 +129,6 @@ export const LoanDetailView: React.FC<LoanDetailViewProps> = ({ loan, onBack }) 
                     ))}
                 </div>
             </div>
-        </div>
-      </div>
-
-      <div className="fixed bottom-0 left-0 right-0 p-4 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 z-50">
-        <div className="max-w-md mx-auto flex gap-4">
-             <button className="flex-1 py-3 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-bold rounded-xl border border-slate-200 dark:border-slate-700">
-                 Defer Payment
-             </button>
-             <button className="flex-[2] py-3 bg-emerald-600 text-white font-bold rounded-xl shadow-lg hover:bg-emerald-700 transition-colors">
-                 Pay Now
-             </button>
         </div>
       </div>
     </div>
