@@ -258,7 +258,11 @@ export const TraderDashboardView: React.FC<TraderDashboardViewProps> = ({ onNavi
 
       {/* Active Loan Card */}
       {hasActiveLoan && traderProfile.activeLoan && (
-          <div id="active-loan-card" className="bg-gradient-to-br from-emerald-600 to-teal-700 rounded-2xl p-5 text-white shadow-lg relative overflow-hidden scroll-mt-24">
+          <div 
+            id="active-loan-card" 
+            onClick={() => onNavigate(ViewType.TRADER_LOAN_DETAIL)}
+            className="bg-gradient-to-br from-emerald-600 to-teal-700 rounded-2xl p-5 text-white shadow-lg relative overflow-hidden scroll-mt-24 cursor-pointer hover:shadow-xl transition-all hover:scale-[1.01]"
+          >
               <div className="absolute top-0 right-0 p-6 opacity-10">
                   <Icon name="verified_user" className="text-9xl" />
               </div>
@@ -313,7 +317,13 @@ export const TraderDashboardView: React.FC<TraderDashboardViewProps> = ({ onNavi
                               <p className="text-xs text-emerald-100 font-bold uppercase">Daily Installment</p>
                               <p className="text-lg font-bold text-white">₦{traderProfile.activeLoan.dailyRepaymentAmount.toLocaleString()}</p>
                           </div>
-                          <button className="px-6 py-2 bg-white text-emerald-700 font-bold rounded-lg shadow-md hover:bg-emerald-50 transition-colors">
+                          <button 
+                            className="px-6 py-2 bg-white text-emerald-700 font-bold rounded-lg shadow-md hover:bg-emerald-50 transition-colors"
+                            onClick={(e) => {
+                                e.stopPropagation(); // Prevent card navigation if clicking button explicitly
+                                onNavigate(ViewType.TRADER_LOAN_DETAIL);
+                            }}
+                          >
                               Pay Now
                           </button>
                       </div>

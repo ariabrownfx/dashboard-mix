@@ -33,6 +33,7 @@ import { EsusuView } from './components/EsusuView';
 import { TraderSavingsView } from './components/TraderSavingsView';
 import { CreateSavingsPlanView } from './components/CreateSavingsPlanView';
 import { SavingsPlanDetailView } from './components/SavingsPlanDetailView';
+import { LoanDetailView } from './components/LoanDetailView';
 // Agent Views
 import { AgentDashboardView } from './components/AgentDashboardView';
 import { AgentTraderManagementView } from './components/AgentTraderManagementView';
@@ -220,6 +221,12 @@ const App: React.FC = () => {
                 return <ActivityView onNavigate={navigateTo} />;
             case ViewType.TRADER_LOAN_APPLY:
                 return <LoanApplicationView onBack={handleBack} />;
+            case ViewType.TRADER_LOAN_DETAIL:
+                return traderProfile.activeLoan ? (
+                    <LoanDetailView loan={traderProfile.activeLoan} onBack={handleBack} />
+                ) : (
+                    <TraderDashboardView onNavigate={navigateTo} traderProfile={traderProfile} />
+                );
             case ViewType.TRADER_ESUSU:
                 return <EsusuView onBack={handleBack} />;
             case ViewType.TRADER_SAVINGS:
@@ -345,6 +352,7 @@ const App: React.FC = () => {
     ViewType.TIERS,
     ViewType.IMPACT,
     ViewType.TRADER_LOAN_APPLY,
+    ViewType.TRADER_LOAN_DETAIL,
     ViewType.TRADER_ESUSU,
     ViewType.TRADER_SAVINGS_CREATE,
     ViewType.TRADER_SAVINGS_PLAN_DETAIL,

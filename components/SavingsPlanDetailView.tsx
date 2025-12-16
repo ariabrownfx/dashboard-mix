@@ -1,7 +1,8 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Icon } from './Icon';
 import { SavingsPlan } from '../types';
+import { MOCK_PAYMENT_METHODS } from '../constants';
 
 interface SavingsPlanDetailViewProps {
   plan: SavingsPlan;
@@ -10,7 +11,41 @@ interface SavingsPlanDetailViewProps {
 
 export const SavingsPlanDetailView: React.FC<SavingsPlanDetailViewProps> = ({ plan, onBack }) => {
   const [showAgentCode, setShowAgentCode] = useState(false);
+  const [showTopUpModal, setShowTopUpModal] = useState(false);
+  
+  // Top Up State
+  const [topUpAmount, setTopUpAmount] = useState('');
+  const [paymentMethod, setPaymentMethod] = useState<'wallet' | 'card'>('wallet');
+  const [selectedCardId, setSelectedCardId] = useState<string>('');
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
+
   const progress = Math.min(100, Math.round((plan.balance / plan.targetAmount) * 100));
+  const cards = MOCK_PAYMENT_METHODS.filter(pm => pm.type === 'card');
+
+  // Set default card
+  useEffect(() => {
+      if (cards.length > 0 && !selectedCardId) {
+          setSelectedCardId(cards[0].id);
+      }
+  }, [cards, selectedCardId]);
+
+  const handleTopUp = (e: React.FormEvent) => {
+      e.preventDefault();
+      setIsProcessing(true);
+      // Simulate API call
+      setTimeout(() => {
+          setIsProcessing(false);
+          setIsSuccess(true);
+      }, 2000);
+  };
+
+  const closeTopUp = () => {
+      setShowTopUpModal(false);
+      setIsSuccess(false);
+      setTopUpAmount('');
+      setIsProcessing(false);
+  };
 
   if (showAgentCode) {
       return (
@@ -101,7 +136,10 @@ export const SavingsPlanDetailView: React.FC<SavingsPlanDetailViewProps> = ({ pl
 
          {/* Actions */}
          <div className="space-y-3 mb-6">
-             <button className="w-full py-4 rounded-xl bg-emerald-500 text-white font-bold shadow-lg shadow-emerald-500/20 active:scale-[0.98] transition-transform flex items-center justify-center gap-2">
+             <button 
+                onClick={() => setShowTopUpModal(true)}
+                className="w-full py-4 rounded-xl bg-emerald-500 text-white font-bold shadow-lg shadow-emerald-500/20 active:scale-[0.98] transition-transform flex items-center justify-center gap-2"
+             >
                  <Icon name="add_card" />
                  <span>Top Up with Card / Wallet</span>
              </button>
@@ -143,6 +181,133 @@ export const SavingsPlanDetailView: React.FC<SavingsPlanDetailViewProps> = ({ pl
              </div>
          </div>
       </div>
+
+      {/* Top Up Modal */}
+      {showTopUpModal && (
+          <div className="fixed inset-0 z-[70] flex items-end sm:items-center justify-center">
+              <div className="absolute inset-0 bg-black/60 backdrop-blur-sm animate-in fade-in" onClick={closeTopUp} />
+              
+              <div className="relative w-full max-w-sm bg-white dark:bg-slate-900 rounded-t-3xl sm:rounded-3xl p-6 shadow-2xl animate-in slide-in-from-bottom duration-300">
+                  {!isSuccess ? (
+                      <form onSubmit={handleTopUp} className="space-y-6">
+                          <div className="flex items-center justify-between">
+                              <h3 className="text-xl font-bold text-slate-800 dark:text-white">Top Up Plan</h3>
+                              <button type="button" onClick={closeTopUp} className="p-2 -mr-2 text-slate-500 hover:text-slate-700 dark:hover:text-slate-300">
+                                  <Icon name="close" />
+                              </button>
+                          </div>
+
+                          {/* Amount */}
+                          <div className="space-y-2">
+                              <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase">Amount to Add</label>
+                              <div className="relative">
+                                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-2xl font-bold text-slate-400">₦</span>
+                                  <input
+                                      type="number"
+                                      value={topUpAmount}
+                                      onChange={(e) => setTopUpAmount(e.target.value)}
+                                      placeholder="0.00"
+                                      className="w-full pl-10 pr-4 py-4 bg-slate-50 dark:bg-slate-800 rounded-xl text-3xl font-bold text-slate-800 dark:text-white placeholder-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                                      autoFocus
+                                  />
+                              </div>
+                          </div>
+
+                          {/* Source */}
+                          <div className="space-y-2">
+                              <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase">Payment Source</label>
+                              <div className="flex bg-slate-100 dark:bg-slate-800 p-1 rounded-xl">
+                                  <button
+                                      type="button"
+                                      onClick={() => setPaymentMethod('wallet')}
+                                      className={`flex-1 py-3 rounded-lg text-sm font-bold transition-all ${
+                                          paymentMethod === 'wallet' 
+                                          ? 'bg-white dark:bg-slate-700 shadow-sm text-slate-800 dark:text-white' 
+                                          : 'text-slate-500 dark:text-slate-400'
+                                      }`}
+                                  >
+                                      Wallet
+                                  </button>
+                                  <button
+                                      type="button"
+                                      onClick={() => setPaymentMethod('card')}
+                                      className={`flex-1 py-3 rounded-lg text-sm font-bold transition-all ${
+                                          paymentMethod === 'card' 
+                                          ? 'bg-white dark:bg-slate-700 shadow-sm text-slate-800 dark:text-white' 
+                                          : 'text-slate-500 dark:text-slate-400'
+                                      }`}
+                                  >
+                                      Card
+                                  </button>
+                              </div>
+
+                              {paymentMethod === 'wallet' ? (
+                                  <div className="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-100 dark:border-slate-700/50 flex justify-between items-center">
+                                      <div className="flex items-center gap-2">
+                                          <Icon name="account_balance_wallet" className="text-slate-400" />
+                                          <span className="text-sm font-medium text-slate-600 dark:text-slate-300">Available Balance</span>
+                                      </div>
+                                      <span className="font-bold text-slate-800 dark:text-white">₦3,400,520</span>
+                                  </div>
+                              ) : (
+                                  <div className="space-y-2 max-h-32 overflow-y-auto pr-1">
+                                      {cards.map(card => (
+                                          <div 
+                                              key={card.id}
+                                              onClick={() => setSelectedCardId(card.id)}
+                                              className={`p-3 rounded-xl border flex items-center justify-between cursor-pointer transition-all ${
+                                                  selectedCardId === card.id
+                                                  ? 'bg-slate-800 dark:bg-white text-white dark:text-slate-900 border-transparent'
+                                                  : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300'
+                                              }`}
+                                          >
+                                              <div className="flex items-center gap-3">
+                                                  <Icon name={card.icon} />
+                                                  <div className="text-left">
+                                                      <p className="text-sm font-bold">{card.name}</p>
+                                                      <p className="text-[10px] opacity-80">{card.mask}</p>
+                                                  </div>
+                                              </div>
+                                              {selectedCardId === card.id && <Icon name="check_circle" className="text-emerald-400 dark:text-emerald-600" />}
+                                          </div>
+                                      ))}
+                                  </div>
+                              )}
+                          </div>
+
+                          <button
+                              type="submit"
+                              disabled={!topUpAmount || isProcessing}
+                              className="w-full py-4 rounded-xl bg-emerald-500 text-white font-bold text-lg shadow-lg shadow-emerald-500/25 active:scale-[0.98] transition-all flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+                          >
+                              {isProcessing ? (
+                                  <span className="size-6 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                              ) : (
+                                  `Confirm ₦${Number(topUpAmount).toLocaleString()}`
+                              )}
+                          </button>
+                      </form>
+                  ) : (
+                      <div className="py-8 flex flex-col items-center justify-center text-center animate-in zoom-in duration-300">
+                          <div className="size-20 bg-emerald-100 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 rounded-full flex items-center justify-center mb-6">
+                              <Icon name="check" className="text-4xl" />
+                          </div>
+                          <h3 className="text-2xl font-bold text-slate-800 dark:text-white mb-2">Funds Added!</h3>
+                          <p className="text-slate-500 dark:text-slate-400 mb-8 max-w-[200px]">
+                              You have successfully added ₦{Number(topUpAmount).toLocaleString()} to {plan.name}.
+                          </p>
+                          <button 
+                              onClick={closeTopUp}
+                              className="w-full py-3.5 bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-bold rounded-xl"
+                          >
+                              Done
+                          </button>
+                      </div>
+                  )}
+                  <div className="h-6 sm:hidden" />
+              </div>
+          </div>
+      )}
     </div>
   );
 };
