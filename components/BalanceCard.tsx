@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Icon } from './Icon';
 import { WalletModal } from './WalletModal';
@@ -48,7 +47,7 @@ export const BalanceCard: React.FC<BalanceCardProps> = ({ compact = false, balan
                     <Icon name={showBalance ? "visibility" : "visibility_off"} className="text-lg" />
                 </button>
               </div>
-              <h2 className={`text-5xl font-sans font-extrabold tracking-tight transition-all duration-300 ${compact ? 'text-slate-800 dark:text-white' : 'text-white'}`}>
+              <h2 className={`text-5xl font-sans font-bold tracking-tight transition-all duration-300 ${compact ? 'text-slate-800 dark:text-white' : 'text-white'}`}>
                 {showBalance ? `₦${balance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : '₦••••••••'}
               </h2>
             </div>
