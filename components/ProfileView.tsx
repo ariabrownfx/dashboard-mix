@@ -245,10 +245,6 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
             </div>
         )}
       </div>
-
-      <div className="text-center pb-8">
-        <p className="text-xs text-slate-400">Version 2.4.2 (Build 2047)</p>
-      </div>
     </div>
   );
 };
