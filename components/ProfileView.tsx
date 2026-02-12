@@ -134,7 +134,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
                     </div>
                     <button 
                         onClick={onToggleSpine}
-                        className={`w-12 h-6 rounded-full transition-colors relative ${isSpineEnabled ? 'bg-primary' : 'bg-slate-200 dark:bg-slate-700'}`}
+                        className={`width-12 height-6 rounded-full transition-colors relative ${isSpineEnabled ? 'bg-primary' : 'bg-slate-200 dark:bg-slate-700'}`}
                     >
                         <div className={`absolute top-1 size-4 bg-white rounded-full transition-all ${isSpineEnabled ? 'right-1' : 'left-1 shadow-sm'}`} />
                     </button>
@@ -215,6 +215,8 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
 
       {/* Simulation Toggle - DEVELOPER SETTINGS */}
       <div className="mt-8 mb-4 border-t border-slate-200 dark:border-slate-700 pt-6">
+        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] text-center mb-4 opacity-50">Version 2.4.0 • Build 882</p>
+        
         <button 
             onClick={() => setShowDemoOptions(!showDemoOptions)}
             className="text-xs font-bold text-slate-400 uppercase tracking-widest w-full text-center hover:text-primary transition-colors mb-4"
