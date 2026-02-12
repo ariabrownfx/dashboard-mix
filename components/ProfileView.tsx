@@ -221,7 +221,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
             onClick={() => setShowDemoOptions(!showDemoOptions)}
             className="text-xs font-bold text-slate-400 uppercase tracking-widest w-full text-center hover:text-primary transition-colors mb-4"
         >
-            {showDemoOptions ? 'Hide Demo Controls' : 'Show Demo Controls'}
+            {showDemoOptions ? 'Hide Demo Control' : 'Show Demo Control'}
         </button>
         
         {showDemoOptions && (
