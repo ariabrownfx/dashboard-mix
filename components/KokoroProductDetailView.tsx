@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Icon } from './Icon';
 // Updated to use SpineProduct as KokoroProduct alias
@@ -82,7 +83,8 @@ export const KokoroProductDetailView: React.FC<KokoroProductDetailViewProps> = (
                 </div>
                 <div className="p-4 border-b border-slate-50 dark:border-slate-700 flex justify-between">
                    <span className="text-sm text-slate-500">Supplier</span>
-                   <span className="text-sm font-bold text-slate-800 dark:text-white">{product.supplier || 'N/A'}</span>
+                   {/* Fix: cast product to any to access potentially dynamic properties not in interface */}
+                   <span className="text-sm font-bold text-slate-800 dark:text-white">{(product as any).supplier || 'N/A'}</span>
                 </div>
                 <div className="p-4 flex justify-between">
                    <span className="text-sm text-slate-500">Stock Worth</span>

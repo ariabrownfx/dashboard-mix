@@ -22,28 +22,24 @@ export const SpineDashboardView: React.FC<SpineDashboardViewProps> = ({
 }) => {
   const [showOutletMenu, setShowOutletMenu] = useState(false);
   
-  const activeOutlet = shop.outlets.find(o => o.id === activeOutletId) || shop.outlets[0];
+  if (!shop) return null;
+
+  const activeOutlet = shop.outlets?.find(o => o.id === activeOutletId) || shop.outlets?.[0];
 
   const filteredSales = useMemo(() => 
     sales.filter(s => s.outletId === activeOutletId && (s.timestamp.toLowerCase().includes('today') || s.timestamp.toLowerCase().includes('now'))), 
     [sales, activeOutletId]
   );
 
+  const hasData = products.length > 0;
+
   // Big Header: Total Revenue recorded today (Accrual basis)
   const todayRevenue = filteredSales.reduce((sum, s) => sum + s.totalAmount, 0);
   const todayProfit = filteredSales.reduce((sum, s) => sum + s.totalProfit, 0);
-  
-  // Realized portion of TODAY'S sales
   const todayCollectedFromSales = filteredSales.reduce((sum, s) => sum + (s.totalAmount - s.balanceDue), 0);
-  // Unrealized portion of TODAY'S sales
   const todayPendingReceivables = filteredSales.reduce((sum, s) => sum + s.balanceDue, 0);
-
-  // Total Physical Cash Flow (New paid sales + any repayments received today)
-  const physicalCashInflow = filteredSales.reduce((sum, s) => {
-      return sum + (s.totalAmount - s.balanceDue);
-  }, 0);
-
-  const totalOwedByAll = shop.customers.reduce((sum, c) => sum + c.totalOwed, 0);
+  const physicalCashInflow = filteredSales.reduce((sum, s) => sum + (s.totalAmount - s.balanceDue), 0);
+  const totalOwedByAll = shop.customers?.reduce((sum, c) => sum + c.totalOwed, 0) || 0;
 
   const alerts = useMemo(() => {
       const now = new Date();
@@ -83,6 +79,86 @@ export const SpineDashboardView: React.FC<SpineDashboardViewProps> = ({
       return { outOfStock, lowStock, expiringSoon, criticalExpiries };
   }, [products, activeOutletId]);
 
+  if (!hasData) {
+      return (
+          <div className="flex flex-col gap-8 animate-in fade-in duration-700 pb-24 px-1">
+              {/* Welcome Header */}
+              <div className="space-y-2">
+                  <p className="text-[10px] font-black uppercase tracking-[0.3em] text-primary">System Ready</p>
+                  <h2 className="text-4xl font-black tracking-tighter text-slate-800 dark:text-white leading-none">Welcome to Spine.</h2>
+                  <p className="text-sm text-slate-500 dark:text-slate-400 font-bold">Your business data vault is currently empty.</p>
+              </div>
+
+              {/* Onboarding Steps */}
+              <div className="space-y-4">
+                  <div className="flex items-center justify-between px-2">
+                      <h3 className="text-xs font-black uppercase tracking-widest text-slate-400">Get Started Guide</h3>
+                      <span className="text-[10px] font-bold text-primary bg-primary/10 px-2 py-0.5 rounded-full uppercase">Step 1/2</span>
+                  </div>
+
+                  {/* Step 1: Add Stock */}
+                  <div 
+                    onClick={() => onNavigate(ViewType.SPINE_ADD_PRODUCT)}
+                    className="bg-white dark:bg-slate-900 rounded-[2.5rem] p-8 border border-slate-200 dark:border-slate-800 shadow-xl relative overflow-hidden group cursor-pointer active:scale-[0.98] transition-all"
+                  >
+                      <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity"><Icon name="add_shopping_cart" className="text-[10rem]" /></div>
+                      <div className="relative z-10 space-y-4">
+                          <div className="size-16 rounded-3xl bg-primary text-white flex items-center justify-center shadow-lg shadow-primary/20">
+                              <Icon name="inventory_2" className="text-4xl" />
+                          </div>
+                          <div>
+                              <h4 className="text-xl font-black text-slate-800 dark:text-white">Add Your First Product</h4>
+                              <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed mt-1">Record what you sell, its cost, and price. We'll help you track every piece and bulk unit.</p>
+                          </div>
+                          <div className="flex items-center gap-2 text-primary font-black uppercase text-[10px] tracking-widest">
+                              <span>Begin Inventory Setup</span>
+                              <Icon name="arrow_forward" className="text-sm" />
+                          </div>
+                      </div>
+                  </div>
+
+                  {/* Step 2: Record Sale (Disabled until step 1) */}
+                  <div className="bg-slate-100 dark:bg-slate-900/40 rounded-[2.5rem] p-8 border border-dashed border-slate-300 dark:border-slate-800 opacity-60">
+                      <div className="space-y-4">
+                          <div className="size-14 rounded-2xl bg-slate-200 dark:bg-slate-800 text-slate-400 flex items-center justify-center">
+                              <Icon name="shopping_basket" className="text-3xl" />
+                          </div>
+                          <div>
+                              <h4 className="text-lg font-black text-slate-400">Record a Sale</h4>
+                              <p className="text-xs text-slate-500">Available after adding stock</p>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+
+              {/* Value Proposition Cards */}
+              <div className="grid grid-cols-2 gap-4">
+                  <div className="bg-blue-50 dark:bg-blue-500/5 p-5 rounded-3xl border border-blue-100 dark:border-blue-500/10">
+                      <Icon name="verified_user" className="text-blue-500 mb-2" />
+                      <p className="text-xs font-black text-slate-800 dark:text-slate-200 uppercase tracking-tighter mb-1">Credit Score</p>
+                      <p className="text-[10px] text-slate-500 leading-tight">Accurate records boost your loan eligibility by up to 40%.</p>
+                  </div>
+                  <div className="bg-amber-50 dark:bg-amber-500/5 p-5 rounded-3xl border border-amber-100 dark:border-amber-500/10">
+                      <Icon name="psychology" className="text-amber-500 mb-2" />
+                      <p className="text-xs font-black text-slate-800 dark:text-slate-200 uppercase tracking-tighter mb-1">AI Insights</p>
+                      <p className="text-[10px] text-slate-500 leading-tight">Spine learns your trade patterns to suggest the best time to restock.</p>
+                  </div>
+              </div>
+
+              {/* Quick Navigation Footer */}
+              <div className="flex justify-center pt-4">
+                  <button 
+                    onClick={() => onNavigate(ViewType.SPINE_MANAGEMENT)}
+                    className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] hover:text-primary transition-colors flex items-center gap-2"
+                  >
+                      <Icon name="settings" className="text-sm" />
+                      Branch Settings
+                  </button>
+              </div>
+          </div>
+      );
+  }
+
   return (
     <div className="flex flex-col gap-6 animate-in fade-in duration-500 pb-24">
       {/* Branch & Management Header */}
@@ -101,7 +177,7 @@ export const SpineDashboardView: React.FC<SpineDashboardViewProps> = ({
                   <>
                     <div className="fixed inset-0 z-40" onClick={() => setShowOutletMenu(false)} />
                     <div className="absolute top-full left-0 mt-2 w-56 bg-white dark:bg-slate-800 rounded-2xl shadow-2xl border border-slate-100 dark:border-slate-700 z-50 overflow-hidden animate-in slide-in-from-top-2">
-                        {shop.outlets.map(o => (
+                        {shop.outlets?.map(o => (
                             <button 
                                 key={o.id}
                                 onClick={() => { onSwitchOutlet(o.id); setShowOutletMenu(false); }}

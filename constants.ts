@@ -45,6 +45,76 @@ export const COLLECTIONS: Collection[] = [
     iconName: 'tv',
     totalInvestors: 520,
     securityType: 'Trade Credit'
+  },
+  {
+    id: 'c3',
+    name: 'Nairobi Flower Export',
+    category: 'Agriculture',
+    location: 'Naivasha',
+    country: 'Kenya',
+    description: 'Export-grade floriculture supply chain funding for smallholder greenhouses serving European markets.',
+    maxReturn: 22.4,
+    minInvestment: 7500,
+    riskLevel: 'Medium',
+    iconName: 'local_florist',
+    totalInvestors: 840,
+    securityType: 'Export Receivables'
+  },
+  {
+    id: 'c4',
+    name: 'Accra Tech Restock',
+    category: 'Technology',
+    location: 'Circle, Accra',
+    country: 'Ghana',
+    description: 'Working capital for major gadget retailers in the bustling Circle market area of Accra.',
+    maxReturn: 14.5,
+    minInvestment: 3000,
+    riskLevel: 'Low',
+    iconName: 'laptop_mac',
+    totalInvestors: 215,
+    securityType: 'Inventory Lien'
+  },
+  {
+    id: 'c5',
+    name: 'Kigali Coffee Co-op',
+    category: 'Agriculture',
+    location: 'Gisenyi',
+    country: 'Rwanda',
+    description: 'Specialty coffee washing station operations and global export financing for rural cooperatives.',
+    maxReturn: 19.8,
+    minInvestment: 12000,
+    riskLevel: 'Medium',
+    iconName: 'coffee',
+    totalInvestors: 156,
+    securityType: 'Commodity Backed'
+  },
+  {
+    id: 'c6',
+    name: 'Cape Logistics Fleet',
+    category: 'Industrial',
+    location: 'Cape Town',
+    country: 'South Africa',
+    description: 'Last-mile logistics expansion for e-commerce delivery partners operating in the Western Cape.',
+    maxReturn: 12.2,
+    minInvestment: 50000,
+    riskLevel: 'Low',
+    iconName: 'local_shipping',
+    totalInvestors: 92,
+    securityType: 'Asset Lease'
+  },
+  {
+    id: 'c7',
+    name: 'Kumasi Timber Trade',
+    category: 'Industrial',
+    location: 'Kumasi',
+    country: 'Ghana',
+    description: 'Sustainable wood processing and furniture export procurement for regional West African trade.',
+    maxReturn: 17.5,
+    minInvestment: 10000,
+    riskLevel: 'High',
+    iconName: 'forest',
+    totalInvestors: 64,
+    securityType: 'Trade Finance'
   }
 ];
 
@@ -90,43 +160,43 @@ export const CLUSTERS: Cluster[] = [
     payoutDate: 'Feb 11, 2024'
   },
   {
-    id: 'c2-30',
-    collectionId: 'c2',
+    id: 'c3-30',
+    collectionId: 'c3',
     durationDays: 30,
-    fixedReturn: 9.0,
-    minInvestment: 2500,
-    fundingProgress: 68,
-    status: 'Open',
-    description: "Monthly cycle for consumer appliance imports.",
+    fixedReturn: 12.0,
+    minInvestment: 7500,
+    fundingProgress: 95,
+    status: 'Filling Fast',
+    description: "Monthly logistics and cold-chain support for flower exports.",
     startDate: 'Nov 2, 2023',
     maturityDate: 'Dec 2, 2023',
-    payoutDate: 'Dec 4, 2023'
+    payoutDate: 'Dec 5, 2023'
   },
   {
-    id: 'c2-60',
-    collectionId: 'c2',
-    durationDays: 60,
-    fixedReturn: 12.8,
-    minInvestment: 5000,
-    fundingProgress: 35,
-    status: 'Open',
-    description: "Multi-shipment electronics consolidation cycle.",
-    startDate: 'Nov 12, 2023',
-    maturityDate: 'Jan 11, 2024',
-    payoutDate: 'Jan 13, 2024'
-  },
-  {
-    id: 'c2-90',
-    collectionId: 'c2',
+    id: 'c4-90',
+    collectionId: 'c4',
     durationDays: 90,
-    fixedReturn: 15.8,
-    minInvestment: 15000,
-    fundingProgress: 92,
-    status: 'Filling Fast',
-    description: "Seasonal bulk purchase of household electronics.",
+    fixedReturn: 14.5,
+    minInvestment: 3000,
+    fundingProgress: 60,
+    status: 'Open',
+    description: "Bulk hardware procurement for festive season sales in Accra.",
     startDate: 'Nov 15, 2023',
     maturityDate: 'Feb 13, 2024',
     payoutDate: 'Feb 16, 2024'
+  },
+  {
+    id: 'c5-180',
+    collectionId: 'c5',
+    durationDays: 180,
+    fixedReturn: 19.8,
+    minInvestment: 12000,
+    fundingProgress: 30,
+    status: 'Open',
+    description: "Full harvest cycle financing for Rwandan coffee exporters.",
+    startDate: 'Nov 20, 2023',
+    maturityDate: 'May 18, 2024',
+    payoutDate: 'May 21, 2024'
   }
 ];
 

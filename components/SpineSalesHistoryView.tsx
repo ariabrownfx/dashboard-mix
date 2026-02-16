@@ -35,7 +35,7 @@ export const SpineSalesHistoryView: React.FC<SpineSalesHistoryViewProps> = ({ sa
     const totalRevenue = filteredSales.reduce((sum, s) => sum + s.totalAmount, 0);
     const totalProfit = filteredSales.reduce((sum, s) => sum + s.totalProfit, 0);
     
-    // Cash Collected includes all money actually received today (Cash sales + amountPaid for others)
+    // Cash Collected includes all money actually received (Cash sales + amountPaid for others)
     const cashCollected = filteredSales.reduce((sum, s) => sum + s.amountPaid, 0);
     const receivables = filteredSales.reduce((sum, s) => sum + s.balanceDue, 0);
     
@@ -97,13 +97,13 @@ export const SpineSalesHistoryView: React.FC<SpineSalesHistoryViewProps> = ({ sa
                     ))}
                 </div>
                 
-                <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.25em] mb-1">Period Inflow (Cash Collected)</p>
+                <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.25em] mb-1">Period Inflow (Actual Cash)</p>
                 <h2 className="text-5xl font-black mb-8 leading-tight tracking-tighter">₦{metrics.cashCollected.toLocaleString()}</h2>
                 
                 <div className="grid grid-cols-2 gap-4">
                     <div className="bg-emerald-500/10 p-4 rounded-2xl border border-emerald-500/20">
-                        <p className="text-[9px] font-black uppercase text-emerald-400 tracking-tighter mb-1">Est. Profit</p>
-                        <p className="text-xl font-black text-emerald-400 leading-none">₦{metrics.profit.toLocaleString()}</p>
+                        <p className="text-[9px] font-black uppercase text-emerald-400 tracking-tighter mb-1">Total Sales</p>
+                        <p className="text-xl font-black text-emerald-400 leading-none">₦{metrics.revenue.toLocaleString()}</p>
                     </div>
                     <div className="bg-rose-500/10 p-4 rounded-2xl border border-rose-500/20">
                         <p className="text-[9px] font-black uppercase text-rose-400 tracking-tighter mb-1">Owed to Shop</p>
@@ -115,17 +115,43 @@ export const SpineSalesHistoryView: React.FC<SpineSalesHistoryViewProps> = ({ sa
         </section>
 
         {/* Sales List */}
-        <div className="px-4 space-y-8 mt-4">
+        <div className="px-4 space-y-10 mt-4">
           {sortedDates.length > 0 ? (
             sortedDates.map((date) => {
               const items = groupedSales[date];
+              
+              // Daily summary calculations
+              const dailyTotal = items.reduce((sum, s) => sum + s.totalAmount, 0);
+              const dailyCash = items.reduce((sum, s) => sum + s.amountPaid, 0);
+              const dailyDebt = items.reduce((sum, s) => sum + s.balanceDue, 0);
+
               return (
-                <div key={date} className="space-y-3">
-                  <div className="flex items-center gap-2 px-2">
-                      <div className="size-1.5 rounded-full bg-primary" />
-                      <h3 className="text-[10px] font-black uppercase tracking-[0.25em] text-slate-500 dark:text-slate-400">
-                        {date}
-                      </h3>
+                <div key={date} className="space-y-4">
+                  <div className="space-y-3 px-1">
+                    <div className="flex items-center gap-2">
+                        <div className="size-2 rounded-full bg-primary" />
+                        <h3 className="text-sm font-black uppercase tracking-[0.2em] text-slate-800 dark:text-white">
+                          {date}
+                        </h3>
+                    </div>
+                    
+                    {/* Daily Breakdown Strip - Only for Weekly/Monthly view to keep it clean */}
+                    {(period === 'weekly' || period === 'monthly') && (
+                        <div className="grid grid-cols-3 gap-2 bg-slate-100 dark:bg-slate-900/50 p-2.5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-inner">
+                            <div className="text-center">
+                                <p className="text-[8px] font-black text-slate-400 uppercase tracking-tighter mb-1">Day Total</p>
+                                <p className="text-xs font-black text-slate-700 dark:text-slate-300">₦{dailyTotal.toLocaleString()}</p>
+                            </div>
+                            <div className="text-center border-x border-slate-200 dark:border-slate-800">
+                                <p className="text-[8px] font-black text-emerald-500 uppercase tracking-tighter mb-1">Cash In</p>
+                                <p className="text-xs font-black text-emerald-500">₦{dailyCash.toLocaleString()}</p>
+                            </div>
+                            <div className="text-center">
+                                <p className="text-[8px] font-black text-rose-500 uppercase tracking-tighter mb-1">New Debt</p>
+                                <p className="text-xs font-black text-rose-500">₦{dailyDebt.toLocaleString()}</p>
+                            </div>
+                        </div>
+                    )}
                   </div>
 
                   <div className="space-y-3">

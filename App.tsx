@@ -70,7 +70,7 @@ import { TaxDashboardView } from './components/TaxDashboardView';
 import { TaxFilingView } from './components/TaxFilingView';
 import { TaxAdminView } from './components/TaxAdminView';
 
-import { ViewType, UserProfile, UserRole, TraderProfile, AgentProfile, SpineProduct, SpineSale, SpineActivity, SpineSaleItem, SpineUser, SpineCustomer, OfferingTab, Investment, ActivityItem, RealEstateManagementType, RealEstatePurchaseType, InvestmentHistoryItem, ManagedTrader } from './types';
+import { ViewType, UserProfile, UserRole, TraderProfile, AgentProfile, SpineProduct, SpineSale, SpineActivity, SpineSaleItem, SpineUser, SpineCustomer, OfferingTab, Investment, ActivityItem, ManagedTrader } from './types';
 import { Icon } from './components/Icon';
 import { PROFILE_FRESH, PROFILE_STARTER, PROFILE_EXPERT, PROFILE_TRADER_NEW, PROFILE_TRADER_ACTIVE, PROFILE_AGENT, SPINE_PRODUCTS_MOCK, SPINE_SALES_MOCK, SPINE_ACTIVITIES_MOCK, SPINE_OUTLETS_MOCK, SPINE_USERS_MOCK, REAL_ESTATE, STOCKS_BONDS, STARTUPS } from './constants';
 
@@ -113,7 +113,7 @@ const App: React.FC = () => {
   const [traderProfile, setTraderProfile] = useState<TraderProfile>(PROFILE_TRADER_ACTIVE);
   const [agentProfile, setAgentProfile] = useState<AgentProfile>(PROFILE_AGENT);
 
-  // Spine Module State - Initialized with rich restored mock data
+  // Spine Module State
   const [spineProducts, setSpineProducts] = useState<SpineProduct[]>(SPINE_PRODUCTS_MOCK);
   const [spineSales, setSpineSales] = useState<SpineSale[]>(SPINE_SALES_MOCK);
   const [spineActivities, setSpineActivities] = useState<SpineActivity[]>(SPINE_ACTIVITIES_MOCK);
@@ -207,21 +207,17 @@ const App: React.FC = () => {
     };
 
     setUserProfile(prev => {
-        // AGGREGATION LOGIC: Check if this asset is already in the portfolio
         const existingIndex = prev.investments.findIndex(i => i.name === investment.name && i.category === investment.category);
-        
         let updatedInvestments;
         if (existingIndex > -1) {
-            // Merge with existing
             const existing = prev.investments[existingIndex];
-            const historyItem: InvestmentHistoryItem = {
+            const historyItem: any = {
                 date: 'Just now',
                 amount: investment.investedAmount,
                 equityOwned: investment.equityOwned,
                 units: investment.units,
                 method: pMethod
             };
-
             const merged: Investment = {
                 ...existing,
                 investedAmount: existing.investedAmount + investment.investedAmount,
@@ -229,12 +225,10 @@ const App: React.FC = () => {
                 units: (existing.units || 0) + (investment.units || 0),
                 history: [...(existing.history || []), historyItem]
             };
-            
             updatedInvestments = [...prev.investments];
             updatedInvestments[existingIndex] = merged;
         } else {
-            // New card (with initial history entry)
-            const firstHistory: InvestmentHistoryItem = {
+            const firstHistory: any = {
                 date: investment.startDate || 'Initial',
                 amount: investment.investedAmount,
                 equityOwned: investment.equityOwned,
@@ -243,7 +237,6 @@ const App: React.FC = () => {
             };
             updatedInvestments = [{ ...investment, history: [firstHistory] }, ...prev.investments];
         }
-
         return {
             ...prev,
             investments: updatedInvestments,
@@ -265,7 +258,6 @@ const App: React.FC = () => {
         date: 'Just now',
         status: 'completed'
     };
-
     setUserProfile(prev => ({
         ...prev,
         activities: [newTx, ...prev.activities],
@@ -295,14 +287,10 @@ const App: React.FC = () => {
         recordedByUserId: activeSpineUser?.id || 'u1' 
     };
     setSpineSales([enrichedSale, ...spineSales]);
-    
     const activityMsg = sale.paymentMethod === 'debt' 
         ? `New Credit Sale recorded for ₦${sale.totalAmount.toLocaleString()}`
         : `New sale recorded for ₦${sale.totalAmount.toLocaleString()}`;
-    
     addSpineActivity('sale_recorded', activityMsg, sale.paymentMethod === 'debt' ? 'warning' : 'info');
-    
-    // Multi-outlet stock deduction logic
     setSpineProducts(prev => prev.map(p => {
         const saleItem = sale.items.find(i => i.productId === p.id);
         if (saleItem) {
@@ -319,8 +307,6 @@ const App: React.FC = () => {
         }
         return p;
     }));
-    
-    // Debt logging if applicable
     if (sale.paymentMethod === 'debt' && sale.customerId) {
         setTraderProfile(prev => {
             if (!prev.spineShop) return prev;
@@ -333,14 +319,10 @@ const App: React.FC = () => {
             return { ...prev, spineShop: nextShop };
         });
     }
-
     handleBack();
   };
 
   const handleSpineRepayment = (customerId: string, amount: number, method: string) => {
-    const timestamp = `Today, ${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
-    
-    // 1. Update Customer Balance
     setTraderProfile(prev => {
         if (!prev.spineShop) return prev;
         return {
@@ -353,46 +335,27 @@ const App: React.FC = () => {
             }
         };
     });
-
-    // 2. Apply Payment to Historical Debt Sales (FIFO - Oldest first)
     setSpineSales(prev => {
         let remainingRepayment = amount;
         return prev.map(sale => {
             if (sale.customerId === customerId && sale.paymentMethod === 'debt' && sale.balanceDue > 0 && remainingRepayment > 0) {
                 const deduction = Math.min(sale.balanceDue, remainingRepayment);
                 remainingRepayment -= deduction;
-                return {
-                    ...sale,
-                    amountPaid: sale.amountPaid + deduction,
-                    balanceDue: sale.balanceDue - deduction
-                };
+                return { ...sale, amountPaid: sale.amountPaid + deduction, balanceDue: sale.balanceDue - deduction };
             }
             return sale;
         });
     });
-
     const customer = traderProfile.spineShop?.customers.find(c => c.id === customerId);
     const customerName = customer?.name || 'Customer';
-    
     addSpineActivity('debt_repayment', `Received ₦${amount.toLocaleString()} from ${customerName} via ${method}`, 'info');
   };
 
   const handleAddSpineCustomer = (name: string, phone: string) => {
-    const newCustomer: SpineCustomer = {
-        id: `c-${Date.now()}`,
-        name,
-        phone,
-        totalOwed: 0
-    };
+    const newCustomer: SpineCustomer = { id: `c-${Date.now()}`, name, phone, totalOwed: 0 };
     setTraderProfile(prev => {
         if (!prev.spineShop) return prev;
-        return {
-            ...prev,
-            spineShop: {
-                ...prev.spineShop,
-                customers: [...prev.spineShop.customers, newCustomer]
-            }
-        };
+        return { ...prev, spineShop: { ...prev.spineShop, customers: [...prev.spineShop.customers, newCustomer] } };
     });
     addSpineActivity('shop_settings_update', `Registered new customer: ${name}`, 'info');
     return newCustomer.id;
@@ -401,17 +364,13 @@ const App: React.FC = () => {
   const handleVoidSpineSale = (saleId: string) => {
     const sale = spineSales.find(s => s.id === saleId);
     if (!sale) return;
-
     setSpineSales(prev => prev.filter(s => s.id !== saleId));
     addSpineActivity('sale_voided', `Voided sale of ₦${sale.totalAmount.toLocaleString()}`, 'alert');
-    
     setSpineProducts(prev => prev.map(p => {
         const saleItem = sale.items.find(i => i.productId === p.id);
         if (saleItem) {
             const nextBalances = p.stockBalances.map(bal => {
-                if (bal.outletId === sale.outletId) {
-                    return { ...bal, pieceQuantity: bal.pieceQuantity + saleItem.quantity };
-                }
+                if (bal.outletId === sale.outletId) { return { ...bal, pieceQuantity: bal.pieceQuantity + saleItem.quantity }; }
                 return bal;
             });
             return { ...p, stockBalances: nextBalances };
@@ -442,18 +401,10 @@ const App: React.FC = () => {
           if (p.id === productId) {
               const nextBalances = p.stockBalances.map(bal => {
                   if (bal.outletId === fromOutletId) {
-                      return { 
-                          ...bal, 
-                          bulkQuantity: Math.max(0, bal.bulkQuantity - bulkQty),
-                          pieceQuantity: Math.max(0, bal.pieceQuantity - pieceQty)
-                      };
+                      return { ...bal, bulkQuantity: Math.max(0, bal.bulkQuantity - bulkQty), pieceQuantity: Math.max(0, bal.pieceQuantity - pieceQty) };
                   }
                   if (bal.outletId === toOutletId) {
-                      return {
-                          ...bal,
-                          bulkQuantity: bal.bulkQuantity + bulkQty,
-                          pieceQuantity: bal.pieceQuantity + pieceQty
-                      };
+                      return { ...bal, bulkQuantity: bal.bulkQuantity + bulkQty, pieceQuantity: bal.pieceQuantity + pieceQty };
                   }
                   return bal;
               });
@@ -461,87 +412,50 @@ const App: React.FC = () => {
           }
           return p;
       }));
-
       const fromName = SPINE_OUTLETS_MOCK.find(o => o.id === fromOutletId)?.name;
       const toName = SPINE_OUTLETS_MOCK.find(o => o.id === toOutletId)?.name;
       const product = spineProducts.find(p => p.id === productId);
-
-      addSpineActivity(
-          'stock_transfer', 
-          `Moved ${bulkQty > 0 ? `${bulkQty} ${product?.bulkUnitName}s ` : ''}${pieceQty > 0 ? `${pieceQty} ${product?.pieceUnitName}s` : ''} from ${fromName} to ${toName}`,
-          'info'
-      );
+      addSpineActivity('stock_transfer', `Moved ${bulkQty > 0 ? `${bulkQty} ${product?.bulkUnitName}s ` : ''}${pieceQty > 0 ? `${pieceQty} ${product?.pieceUnitName}s` : ''} from ${fromName} to ${toName}`, 'info');
   };
 
   const handleSpineStockAdjustment = (productId: string, outletId: string, type: 'damage' | 'loss' | 'return' | 'expired', bulkQty: number, pieceQty: number) => {
       setSpineProducts(prev => prev.map(p => {
           if (p.id === productId) {
-              // 1. Update general stock balances for the outlet
               const nextBalances = p.stockBalances.map(bal => {
                   if (bal.outletId === outletId) {
-                      return {
-                          ...bal,
-                          bulkQuantity: Math.max(0, bal.bulkQuantity - bulkQty),
-                          pieceQuantity: Math.max(0, bal.pieceQuantity - pieceQty)
-                      };
+                      return { ...bal, bulkQuantity: Math.max(0, bal.bulkQuantity - bulkQty), pieceQuantity: Math.max(0, bal.pieceQuantity - pieceQty) };
                   }
                   return bal;
               });
-
-              // 2. Update specific batches (FIFO based on expiry date) to clear notifications
-              // This logic ensures that taking care of an expiration notice clears the tag/notification
               let remainingBulkToDeduct = bulkQty;
               let remainingPieceToDeduct = pieceQty;
-              
-              // Sort batches by expiry date (earliest first)
               const sortedBatches = [...(p.batches || [])].sort((a, b) => {
                   if (!a.expiryDate) return 1;
                   if (!b.expiryDate) return -1;
                   return new Date(a.expiryDate).getTime() - new Date(b.expiryDate).getTime();
               });
-
               const nextBatches = sortedBatches.map(batch => {
                   if (batch.outletId !== outletId) return batch;
-                  
                   let nextBatch = { ...batch };
-                  
-                  // Deduct bulk from this batch
                   if (remainingBulkToDeduct > 0 && nextBatch.bulkQuantity > 0) {
                       const deduct = Math.min(nextBatch.bulkQuantity, remainingBulkToDeduct);
                       nextBatch.bulkQuantity -= deduct;
                       remainingBulkToDeduct -= deduct;
                   }
-                  
-                  // Deduct pieces from this batch
                   if (remainingPieceToDeduct > 0 && nextBatch.pieceQuantity > 0) {
                       const deduct = Math.min(nextBatch.pieceQuantity, remainingPieceToDeduct);
                       nextBatch.pieceQuantity -= deduct;
                       remainingPieceToDeduct -= deduct;
                   }
-                  
                   return nextBatch;
               });
-
-              return { 
-                  ...p, 
-                  stockBalances: nextBalances,
-                  batches: nextBatches,
-                  // Also update global totals for consistency
-                  bulkQuantity: Math.max(0, p.bulkQuantity - bulkQty),
-                  pieceQuantity: Math.max(0, p.pieceQuantity - pieceQty)
-              };
+              return { ...p, stockBalances: nextBalances, batches: nextBatches, bulkQuantity: Math.max(0, p.bulkQuantity - bulkQty), pieceQuantity: Math.max(0, p.pieceQuantity - pieceQty) };
           }
           return p;
       }));
-
       const outletName = SPINE_OUTLETS_MOCK.find(o => o.id === outletId)?.name;
       const product = spineProducts.find(p => p.id === productId);
-
-      addSpineActivity(
-          'stock_adjustment',
-          `Adjusted stock for ${product?.name} at ${outletName} due to ${type}: -${bulkQty} bulk, -${pieceQty} pieces`,
-          type === 'expired' ? 'alert' : 'warning'
-      );
+      addSpineActivity('stock_adjustment', `Adjusted stock for ${product?.name} at ${outletName} due to ${type}: -${bulkQty} bulk, -${pieceQty} pieces`, type === 'expired' ? 'alert' : 'warning');
       handleBack();
   };
 
@@ -550,7 +464,7 @@ const App: React.FC = () => {
     setIsSpineEnabled(newState);
     if (!newState) {
         setActiveSpineUser(null);
-        if (currentView.toString().startsWith('SPINE')) {
+        if (currentView.toString().startsWith('Spine')) {
             navigateTo(ViewType.DASHBOARD, undefined, true);
         }
     }
@@ -580,18 +494,29 @@ const App: React.FC = () => {
   };
 
   const simulateProfile = (type: 'fresh' | 'starter' | 'expert') => {
+      setActiveSpineUser(null);
+      
       switch(type) {
           case 'fresh': 
               setUserProfile(PROFILE_FRESH); 
               setTraderProfile(PROFILE_TRADER_NEW);
+              setSpineProducts([]);
+              setSpineSales([]);
+              setSpineActivities([]);
               break;
           case 'starter': 
               setUserProfile(PROFILE_STARTER); 
               setTraderProfile(PROFILE_TRADER_NEW);
+              setSpineProducts(SPINE_PRODUCTS_MOCK.slice(0, 3));
+              setSpineSales(SPINE_SALES_MOCK.slice(0, 5));
+              setSpineActivities(SPINE_ACTIVITIES_MOCK.slice(0, 2));
               break;
           case 'expert': 
               setUserProfile(PROFILE_EXPERT); 
               setTraderProfile(PROFILE_TRADER_ACTIVE);
+              setSpineProducts(SPINE_PRODUCTS_MOCK);
+              setSpineSales(SPINE_SALES_MOCK);
+              setSpineActivities(SPINE_ACTIVITIES_MOCK);
               break;
       }
       navigateTo(ViewType.DASHBOARD, undefined, true);
@@ -648,13 +573,16 @@ const App: React.FC = () => {
                 return inv ? <ActiveInvestmentDetailView investment={inv} onBack={handleBack} /> : <DashboardView onNavigate={navigateTo} userProfile={userProfile} />;
             case ViewType.REAL_ESTATE_DETAIL:
                 const property = REAL_ESTATE.find(r => r.id === selectedRealEstateId);
-                return property ? <RealEstateDetailView property={property} onBack={handleBack} onAddInvestment={handleAddInvestment} userBalance={userProfile.walletBalance} /> : handleBack();
+                if (!property) { handleBack(); return null; }
+                return <RealEstateDetailView property={property} onBack={handleBack} onAddInvestment={handleAddInvestment} userBalance={userProfile.walletBalance} />;
             case ViewType.STOCK_DETAIL:
                 const stock = STOCKS_BONDS.find(s => s.id === selectedStockId);
-                return stock ? <StockDetailView stock={stock} onBack={handleBack} onAddInvestment={handleAddInvestment} userBalance={userProfile.walletBalance} /> : handleBack();
+                if (!stock) { handleBack(); return null; }
+                return <StockDetailView stock={stock} onBack={handleBack} onAddInvestment={handleAddInvestment} userBalance={userProfile.walletBalance} />;
             case ViewType.STARTUP_DETAIL:
                 const startup = STARTUPS.find(s => s.id === selectedStartupId);
-                return startup ? <StartupDetailView startup={startup} onBack={handleBack} onAddInvestment={handleAddInvestment} userBalance={userProfile.walletBalance} /> : handleBack();
+                if (!startup) { handleBack(); return null; }
+                return <StartupDetailView startup={startup} onBack={handleBack} onAddInvestment={handleAddInvestment} userBalance={userProfile.walletBalance} />;
             case ViewType.INVESTOR_SAVINGS: return <InvestorSavingsView onNavigate={navigateTo} userProfile={userProfile} />;
             case ViewType.INVESTOR_SAVINGS_CREATE: return <CreateSavingsPlanView onBack={handleBack} />;
             case ViewType.INVESTOR_SAVINGS_DETAIL:
@@ -666,9 +594,9 @@ const App: React.FC = () => {
         }
     } 
     else if (userRole === 'trader') {
-        const isSpineView = currentView.toString().startsWith('SPINE');
+        const isSpineView = currentView.toString().startsWith('Spine');
         
-        if (isSpineView && isSpineEnabled && !activeSpineUser) {
+        if (isSpineView && isSpineEnabled && (!activeSpineUser || !traderProfile.spineShop)) {
             if (!traderProfile.spineShop) {
                 return <SpineShopSetupView onComplete={() => {
                     setTraderProfile({...traderProfile, spineShop: { id: 'ks1', traderId: traderProfile.id, category: 'General', mainItems: [], language: 'English', currency: 'NGN', outlets: SPINE_OUTLETS_MOCK, users: SPINE_USERS_MOCK, customers: [] }});
@@ -680,27 +608,32 @@ const App: React.FC = () => {
         switch (currentView) {
             case ViewType.DASHBOARD: return <TraderDashboardView onNavigate={navigateTo} traderProfile={traderProfile} />;
             case ViewType.SPINE_DASHBOARD:
+                if (!traderProfile.spineShop) { handleBack(); return null; }
                 return <SpineDashboardView 
                             onNavigate={navigateTo} 
                             products={spineProducts} 
                             sales={spineSales} 
-                            shop={traderProfile.spineShop!} 
+                            shop={traderProfile.spineShop} 
                             activeOutletId={activeOutletId} 
                             onSwitchOutlet={setActiveOutletId} 
                         />;
             case ViewType.SPINE_INVENTORY: return <SpineInventoryView onBack={handleBack} onNavigate={navigateTo} products={spineProducts} />;
             case ViewType.SPINE_PRODUCT_DETAIL:
                 const prod = spineProducts.find(p => p.id === selectedProductId);
-                return prod ? <SpineProductDetailView product={prod} onBack={handleBack} onNavigate={navigateTo} /> : handleBack();
+                if (!prod) { handleBack(); return null; }
+                return <SpineProductDetailView product={prod} onBack={handleBack} onNavigate={navigateTo} />;
             case ViewType.SPINE_ADD_PRODUCT:
                 const existingProd = spineProducts.find(p => p.id === selectedProductId);
                 return <SpineAddProductView onBack={handleBack} existingProduct={existingProd} onSave={handleSaveSpineProduct} products={spineProducts} />;
             case ViewType.SPINE_POS:
                 return <SpinePOSView products={spineProducts} customers={traderProfile.spineShop?.customers || []} onBack={handleBack} onNavigate={navigateTo} onRecordSale={handleRecordSpineSale} onAddCustomer={handleAddSpineCustomer} startAtCheckout={posMode === 'checkout'} initialCart={pushedItems || []} />;
-            case ViewType.SPINE_SALES_HISTORY: return <SpineSalesHistoryView sales={spineSales} shop={traderProfile.spineShop!} onBack={handleBack} onNavigate={navigateTo} />;
+            case ViewType.SPINE_SALES_HISTORY: 
+                if (!traderProfile.spineShop) { handleBack(); return null; }
+                return <SpineSalesHistoryView sales={spineSales} shop={traderProfile.spineShop} onBack={handleBack} onNavigate={navigateTo} />;
             case ViewType.SPINE_SALE_DETAIL:
                 const sale = spineSales.find(s => s.id === selectedSaleId);
-                return sale ? <SpineSaleDetailView sale={sale} shop={traderProfile.spineShop!} onBack={handleBack} onVoid={handleVoidSpineSale} /> : handleBack();
+                if (!sale || !traderProfile.spineShop) { handleBack(); return null; }
+                return <SpineSaleDetailView sale={sale} shop={traderProfile.spineShop} onBack={handleBack} onVoid={handleVoidSpineSale} />;
             case ViewType.SPINE_CALCULATOR: 
                 return <SpineCalculatorView 
                             products={spineProducts} 
@@ -719,24 +652,30 @@ const App: React.FC = () => {
                             }}
                         />;
             case ViewType.SPINE_GROWTH: 
+                if (!traderProfile.spineShop) { handleBack(); return null; }
                 return <SpineGrowthView 
                             products={spineProducts} 
                             sales={spineSales} 
-                            shop={traderProfile.spineShop!}
+                            shop={traderProfile.spineShop}
                             onBack={handleBack} 
                             onNavigate={navigateTo} 
                             onToggleSlash={toggleSlashStorefront}
                         />;
             case ViewType.SPINE_ACTIVITIES: return <SpineActivitiesView activities={spineActivities} onBack={handleBack} />;
-            case ViewType.SPINE_MANAGEMENT: return <SpineManagementView shop={traderProfile.spineShop!} onBack={handleBack} />;
+            case ViewType.SPINE_MANAGEMENT: 
+                if (!traderProfile.spineShop) { handleBack(); return null; }
+                return <SpineManagementView shop={traderProfile.spineShop} onBack={handleBack} />;
             case ViewType.SPINE_STOCK_TRANSFER:
                 const transferProd = spineProducts.find(p => p.id === selectedProductId);
-                return transferProd ? <SpineStockTransferView product={transferProd} outlets={traderProfile.spineShop!.outlets} onBack={handleBack} onTransfer={handleSpineStockTransfer} /> : handleBack();
+                if (!transferProd || !traderProfile.spineShop) { handleBack(); return null; }
+                return <SpineStockTransferView product={transferProd} outlets={traderProfile.spineShop.outlets} onBack={handleBack} onTransfer={handleSpineStockTransfer} />;
             case ViewType.SPINE_DEBT_CENTER:
-                return <SpineDebtCenterView shop={traderProfile.spineShop!} sales={spineSales} onBack={handleBack} onRepayment={handleSpineRepayment} onAddCustomer={handleAddSpineCustomer} />;
+                if (!traderProfile.spineShop) { handleBack(); return null; }
+                return <SpineDebtCenterView shop={traderProfile.spineShop} sales={spineSales} onBack={handleBack} onRepayment={handleSpineRepayment} onAddCustomer={handleAddSpineCustomer} />;
             case ViewType.SPINE_ADJUST_STOCK:
                 const adjustProd = spineProducts.find(p => p.id === selectedProductId);
-                return adjustProd ? <SpineAdjustStockView product={adjustProd} outlets={traderProfile.spineShop!.outlets} onBack={handleBack} onAdjust={handleSpineStockAdjustment} /> : handleBack();
+                if (!adjustProd || !traderProfile.spineShop) { handleBack(); return null; }
+                return <SpineAdjustStockView product={adjustProd} outlets={traderProfile.spineShop.outlets} onBack={handleBack} onAdjust={handleSpineStockAdjustment} />;
             case ViewType.SPINE_SLASH_ORDERS:
                 return <SpineSlashOrdersView onBack={handleBack} onNavigate={navigateTo} products={spineProducts} />;
             case ViewType.SPINE_CAMERAS:
@@ -793,7 +732,11 @@ const App: React.FC = () => {
             const activity = userProfile.activities.find(t => t.id === selectedTransactionId) || 
                              traderProfile.activities.find(t => t.id === selectedTransactionId) || 
                              agentProfile.activities.find(t => t.id === selectedTransactionId);
-            return activity ? <TransactionDetailView transaction={activity} onBack={handleBack} /> : <ActivityView onNavigate={navigateTo} />;
+            return activity ? (
+                <TransactionDetailView transaction={activity} onBack={handleBack} />
+            ) : (
+                <ActivityView onNavigate={navigateTo} />
+            );
         case ViewType.TAX_PROFILE: return <TaxProfileView onBack={handleBack} onNavigate={navigateTo} />;
         case ViewType.TAX_DASHBOARD: return <TaxDashboardView onBack={handleBack} onNavigate={navigateTo} />;
         case ViewType.TAX_FILING: return <TaxFilingView onBack={handleBack} onNavigate={navigateTo} />;
@@ -852,7 +795,7 @@ const App: React.FC = () => {
                     isSpineEnabled && (
                       <button
                           onClick={() => navigateTo(ViewType.SPINE_DASHBOARD)}
-                          className={`flex flex-col items-center justify-center gap-1 w-16 transition-all duration-300 ${currentView.toString().startsWith('SPINE') ? 'text-primary' : 'text-slate-400'}`}
+                          className={`flex flex-col items-center justify-center gap-1 w-16 transition-all duration-300 ${currentView.toString().startsWith('Spine') ? 'text-primary' : 'text-slate-400'}`}
                       >
                           <Icon name="storefront" className="text-[26px]" />
                           <span className="text-[10px] font-medium">Spine</span>

@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Icon } from './Icon';
 // Updated to use Spine types as aliases to replace missing Kokoro types
@@ -24,7 +25,9 @@ export const KokoroPOSView: React.FC<KokoroPOSViewProps> = ({ products, onBack, 
         productId: product.id, 
         productName: product.name, 
         quantity: 1, 
-        priceAtSale: product.sellingPricePerPiece 
+        priceAtSale: product.sellingPricePerPiece,
+        // Fix: Add missing unitType property required by SpineSaleItem
+        unitType: 'piece'
       }]);
     }
   };
