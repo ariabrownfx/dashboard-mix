@@ -124,16 +124,12 @@ export const SpineAddProductView: React.FC<SpineAddProductViewProps> = ({ onBack
   const [bulkUnitName, setBulkUnitName] = useState(existingProduct?.bulkUnitName || 'Bunch');
   const [pieceUnitName, setPieceUnitName] = useState(existingProduct?.pieceUnitName || 'Finger');
 
-  const [bulkQty, setBulkQty] = useState(existingProduct?.bulkQuantity.toString() || '');
-  const [loosePieceQty, setLoosePieceQty] = useState(existingProduct?.pieceQuantity.toString() || '0');
   const [unitsPerBulk, setUnitsPerBulk] = useState(existingProduct?.unitsPerBulk.toString() || '12');
   
-  const [costPrice, setCostPrice] = useState(existingProduct ? (existingProduct.costPricePerPiece * existingProduct.unitsPerBulk).toString() : '');
   const [sellingPricePerPiece, setSellingPricePerPiece] = useState(existingProduct?.sellingPricePerPiece.toString() || '');
   const [sellingPricePerBulk, setSellingPricePerBulk] = useState(existingProduct?.sellingPricePerBulk?.toString() || '');
   
   const [serialNumber, setSerialNumber] = useState(existingProduct?.serialNumber || '');
-  const [expiryDate, setExpiryDate] = useState('');
   const [isScanning, setIsScanning] = useState(false);
   const [scanMessage, setScanMessage] = useState<string | null>(null);
 
@@ -144,7 +140,6 @@ export const SpineAddProductView: React.FC<SpineAddProductViewProps> = ({ onBack
       setBulkUnitName(p.bulkUnitName);
       setPieceUnitName(p.pieceUnitName);
       setUnitsPerBulk(p.unitsPerBulk.toString());
-      setCostPrice((p.costPricePerPiece * p.unitsPerBulk).toString());
       setSellingPricePerPiece(p.sellingPricePerPiece.toString());
       setSellingPricePerBulk(p.sellingPricePerBulk?.toString() || '');
       setSerialNumber(p.serialNumber || '');
@@ -155,7 +150,6 @@ export const SpineAddProductView: React.FC<SpineAddProductViewProps> = ({ onBack
     if (!isVoiceActive) {
       setTimeout(() => {
         if (!name) setName('Bananas (Sweet)');
-        if (!costPrice) setCostPrice('800');
         setIsVoiceActive(false);
       }, 2000);
     }
@@ -194,39 +188,25 @@ export const SpineAddProductView: React.FC<SpineAddProductViewProps> = ({ onBack
 
   const handleFinish = () => {
     const units = Number(unitsPerBulk) || 1;
-    const bQty = Number(bulkQty) || 0;
-    const lQty = Number(loosePieceQty) || 0;
-    const cPrice = Number(costPrice) || 0;
     
-    const newBatch: SpineBatch | undefined = (bQty > 0 || lQty > 0) ? {
-        id: `batch-${Date.now()}`,
-        expiryDate: expiryDate,
-        bulkQuantity: bQty,
-        pieceQuantity: lQty,
-        addedAt: new Date().toISOString(),
-        outletId: 'o1' // Default to HQ
-    } : undefined;
-
     const product: SpineProduct = {
         id: existingProduct?.id || `p-${Date.now()}`,
         name,
         bulkUnitName: bulkUnitName || 'Bulk',
         pieceUnitName: pieceUnitName || 'Piece',
-        bulkQuantity: (existingProduct?.bulkQuantity || 0) + bQty,
+        bulkQuantity: existingProduct?.bulkQuantity || 0,
         unitsPerBulk: units,
-        pieceQuantity: (existingProduct?.pieceQuantity || 0) + lQty,
-        costPricePerPiece: cPrice / units,
+        pieceQuantity: existingProduct?.pieceQuantity || 0,
+        costPricePerPiece: existingProduct?.costPricePerPiece || 0,
         sellingPricePerPiece: Number(sellingPricePerPiece) || 0,
         sellingPricePerBulk: sellingPricePerBulk ? Number(sellingPricePerBulk) : undefined,
         serialNumber,
         category: existingProduct?.category || 'General',
         stockBalances: existingProduct?.stockBalances || [],
-        batches: [...(existingProduct?.batches || []), ...(newBatch ? [newBatch] : [])]
+        batches: existingProduct?.batches || []
     };
     onSave(product);
   };
-
-  const unitCost = (Number(costPrice) || 0) / (Number(unitsPerBulk) || 1);
 
   return (
     <div className="fixed inset-0 z-[70] bg-background-light dark:bg-background-dark flex flex-col animate-in slide-in-from-right duration-300">
@@ -252,7 +232,7 @@ export const SpineAddProductView: React.FC<SpineAddProductViewProps> = ({ onBack
         <button onClick={onBack} className="p-2 -ml-2 rounded-full text-slate-600 dark:text-slate-300">
           <Icon name="close" className="text-2xl" />
         </button>
-        <h1 className="text-lg font-bold flex-1 text-slate-800 dark:text-white">{existingProduct ? 'Edit Stock' : 'New Product'}</h1>
+        <h1 className="text-lg font-bold flex-1 text-slate-800 dark:text-white">{existingProduct ? 'Edit Product' : 'New Product'}</h1>
       </header>
 
       <div className="flex-1 overflow-y-auto p-6 space-y-8 pb-28">
@@ -312,27 +292,6 @@ export const SpineAddProductView: React.FC<SpineAddProductViewProps> = ({ onBack
              </div>
            </div>
 
-           {/* Expiry Tracking Section */}
-           <div className="bg-rose-50 dark:bg-rose-900/20 p-5 rounded-3xl border border-rose-100 dark:border-rose-800/50 space-y-4 shadow-inner animate-in slide-in-from-top-2">
-              <div className="flex items-center gap-2 mb-2">
-                <div className="size-2 rounded-full bg-rose-500" />
-                <h3 className="text-[10px] font-black text-rose-600 dark:text-rose-400 uppercase tracking-widest">Expiration Tracking</h3>
-              </div>
-              <div className="space-y-2">
-                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Batch Expiry Date</label>
-                <div className="relative">
-                    <Icon name="event" className="absolute left-4 top-1/2 -translate-y-1/2 text-rose-400" />
-                    <input 
-                        type="date"
-                        value={expiryDate}
-                        onChange={(e) => setExpiryDate(e.target.value)}
-                        className="w-full pl-11 pr-4 py-3.5 bg-white dark:bg-slate-800 border border-rose-200 dark:border-rose-700 rounded-2xl font-bold text-slate-800 dark:text-white outline-none focus:ring-2 focus:ring-rose-500 shadow-sm"
-                    />
-                </div>
-                <p className="text-[9px] text-slate-500 italic ml-1">Leave empty if item does not expire.</p>
-              </div>
-           </div>
-
            {/* Unit Definition Section */}
            <div className="bg-slate-50 dark:bg-slate-900/50 p-5 rounded-3xl border border-slate-100 dark:border-slate-800 space-y-4 shadow-inner">
               <div className="flex items-center gap-2 mb-2">
@@ -378,44 +337,6 @@ export const SpineAddProductView: React.FC<SpineAddProductViewProps> = ({ onBack
               </div>
            </div>
 
-           {/* Stock Quantity Section */}
-           <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest ml-1">Total {bulkUnitName}s</label>
-                <input 
-                  type="number" 
-                  value={bulkQty}
-                  onChange={(e) => setBulkQty(e.target.value)}
-                  placeholder="0" 
-                  className="w-full p-4 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl font-bold text-slate-800 dark:text-white outline-none focus:ring-2 focus:ring-primary shadow-sm"
-                />
-              </div>
-              <div className="space-y-2">
-                <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest ml-1">Loose {pieceUnitName}s</label>
-                <input 
-                  type="number" 
-                  value={loosePieceQty}
-                  onChange={(e) => setLoosePieceQty(e.target.value)}
-                  placeholder="0" 
-                  className="w-full p-4 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl font-bold text-slate-800 dark:text-white outline-none focus:ring-2 focus:ring-primary shadow-sm"
-                />
-              </div>
-           </div>
-
-           <div className="space-y-2">
-             <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider ml-1">{bulkUnitName} Cost Price</label>
-             <div className="relative">
-                <span className="absolute left-4 top-1/2 -translate-y-1/2 font-bold text-slate-400">₦</span>
-                <input 
-                  type="number" 
-                  value={costPrice}
-                  onChange={(e) => setCostPrice(e.target.value)}
-                  className="w-full pl-10 pr-4 py-4 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl font-bold text-slate-800 dark:text-white outline-none focus:ring-2 focus:ring-primary shadow-sm"
-                />
-             </div>
-             <p className="text-[10px] text-slate-400 font-bold ml-1 uppercase tracking-tight">Est. Cost per {pieceUnitName}: <span className="text-slate-600 dark:text-slate-300">₦{unitCost.toFixed(2)}</span></p>
-           </div>
-
            <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider ml-1">Sell Price / {pieceUnitName}</label>
@@ -451,7 +372,7 @@ export const SpineAddProductView: React.FC<SpineAddProductViewProps> = ({ onBack
           onClick={handleFinish}
           className="w-full py-4 bg-primary text-white font-black uppercase tracking-widest rounded-2xl shadow-xl shadow-primary/20 active:scale-[0.98] transition-all"
         >
-          {existingProduct ? 'Save Changes' : 'Confirm & Record Stock'}
+          {existingProduct ? 'Save Changes' : 'Create Product'}
         </button>
       </div>
       

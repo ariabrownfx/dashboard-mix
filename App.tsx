@@ -56,6 +56,7 @@ import { SpineAuthView } from './components/SpineAuthView';
 import { SpineStockTransferView } from './components/SpineStockTransferView';
 import { SpineDebtCenterView } from './components/SpineDebtCenterView';
 import { SpineAdjustStockView } from './components/SpineAdjustStockView';
+import { SpineAddStockView } from './components/SpineAddStockView';
 import { SpineSlashOrdersView } from './components/SpineSlashOrdersView';
 import { SpineCamerasView } from './components/SpineCamerasView';
 // Agent Views
@@ -70,7 +71,7 @@ import { TaxDashboardView } from './components/TaxDashboardView';
 import { TaxFilingView } from './components/TaxFilingView';
 import { TaxAdminView } from './components/TaxAdminView';
 
-import { ViewType, UserProfile, UserRole, TraderProfile, AgentProfile, SpineProduct, SpineSale, SpineActivity, SpineSaleItem, SpineUser, SpineCustomer, OfferingTab, Investment, ActivityItem, ManagedTrader } from './types';
+import { ViewType, UserProfile, UserRole, TraderProfile, AgentProfile, SpineProduct, SpineSale, SpineActivity, SpineSaleItem, SpineUser, SpineCustomer, OfferingTab, Investment, ActivityItem, ManagedTrader, SpineBatch, SpineOutlet } from './types';
 import { Icon } from './components/Icon';
 import { PROFILE_FRESH, PROFILE_STARTER, PROFILE_EXPERT, PROFILE_TRADER_NEW, PROFILE_TRADER_ACTIVE, PROFILE_AGENT, SPINE_PRODUCTS_MOCK, SPINE_SALES_MOCK, SPINE_ACTIVITIES_MOCK, SPINE_OUTLETS_MOCK, SPINE_USERS_MOCK, REAL_ESTATE, STOCKS_BONDS, STARTUPS } from './constants';
 
@@ -173,6 +174,9 @@ const App: React.FC = () => {
         setSelectedProductId(id);
     }
     if (view === ViewType.SPINE_ADJUST_STOCK && id) {
+        setSelectedProductId(id);
+    }
+    if (view === ViewType.SPINE_ADD_STOCK && id) {
         setSelectedProductId(id);
     }
     if (view === ViewType.SPINE_POS) {
@@ -459,6 +463,48 @@ const App: React.FC = () => {
       handleBack();
   };
 
+  const handleSpineAddStock = (productId: string, outletId: string, bulkQty: number, pieceQty: number, costPrice: number, expiryDate: string) => {
+    setSpineProducts(prev => prev.map(p => {
+        if (p.id === productId) {
+            const newBatch: SpineBatch = {
+                id: `batch-${Date.now()}`,
+                expiryDate,
+                bulkQuantity: bulkQty,
+                pieceQuantity: pieceQty,
+                addedAt: new Date().toISOString(),
+                outletId
+            };
+            
+            const updatedBalances = [...p.stockBalances];
+            const bIndex = updatedBalances.findIndex(b => b.outletId === outletId);
+            if (bIndex >= 0) {
+                updatedBalances[bIndex] = {
+                    ...updatedBalances[bIndex],
+                    bulkQuantity: updatedBalances[bIndex].bulkQuantity + bulkQty,
+                    pieceQuantity: updatedBalances[bIndex].pieceQuantity + pieceQty
+                };
+            } else {
+                updatedBalances.push({ outletId, bulkQuantity: bulkQty, pieceQuantity: pieceQty });
+            }
+
+            return {
+                ...p,
+                bulkQuantity: p.bulkQuantity + bulkQty,
+                pieceQuantity: p.pieceQuantity + pieceQty,
+                stockBalances: updatedBalances,
+                batches: [...(p.batches || []), newBatch],
+                costPricePerPiece: costPrice > 0 ? (costPrice / p.unitsPerBulk) : p.costPricePerPiece
+            };
+        }
+        return p;
+    }));
+
+    const prod = spineProducts.find(p => p.id === productId);
+    const outletName = SPINE_OUTLETS_MOCK.find(o => o.id === outletId)?.name;
+    addSpineActivity('stock_update', `Restocked ${bulkQty} bulk & ${pieceQty} pieces of ${prod?.name || 'item'} at ${outletName}`, 'info');
+    handleBack();
+  };
+
   const handleToggleSpine = () => {
     const newState = !isSpineEnabled;
     setIsSpineEnabled(newState);
@@ -676,6 +722,15 @@ const App: React.FC = () => {
                 const adjustProd = spineProducts.find(p => p.id === selectedProductId);
                 if (!adjustProd || !traderProfile.spineShop) { handleBack(); return null; }
                 return <SpineAdjustStockView product={adjustProd} outlets={traderProfile.spineShop.outlets} onBack={handleBack} onAdjust={handleSpineStockAdjustment} />;
+            case ViewType.SPINE_ADD_STOCK:
+                if (!traderProfile.spineShop) { handleBack(); return null; }
+                return <SpineAddStockView 
+                            products={spineProducts} 
+                            outlets={traderProfile.spineShop.outlets} 
+                            onBack={handleBack} 
+                            onAddStock={handleSpineAddStock} 
+                            initialProductId={selectedProductId}
+                        />;
             case ViewType.SPINE_SLASH_ORDERS:
                 return <SpineSlashOrdersView onBack={handleBack} onNavigate={navigateTo} products={spineProducts} />;
             case ViewType.SPINE_CAMERAS:
@@ -757,7 +812,7 @@ const App: React.FC = () => {
     ViewType.SAVINGS_STREAK_DETAIL, ViewType.SPINE_SETUP, ViewType.SPINE_ADD_PRODUCT, ViewType.SPINE_PRODUCT_DETAIL,
     ViewType.SPINE_POS, ViewType.SPINE_SALE_DETAIL, ViewType.SPINE_GROWTH, ViewType.SPINE_CALCULATOR, ViewType.SPINE_ACTIVITIES,
     ViewType.TAX_PROFILE, ViewType.TAX_DASHBOARD, ViewType.TAX_FILING, ViewType.TAX_ADMIN, ViewType.SPINE_MANAGEMENT,
-    ViewType.SPINE_STOCK_TRANSFER, ViewType.SPINE_DEBT_CENTER, ViewType.SPINE_ADJUST_STOCK, ViewType.SPINE_ADJUST_STOCK,
+    ViewType.SPINE_STOCK_TRANSFER, ViewType.SPINE_DEBT_CENTER, ViewType.SPINE_ADJUST_STOCK, ViewType.SPINE_ADD_STOCK,
     ViewType.SPINE_SLASH_ORDERS, ViewType.INVESTOR_SLASH_SHOP, ViewType.REAL_ESTATE_DETAIL, ViewType.STOCK_DETAIL, 
     ViewType.STARTUP_DETAIL, ViewType.SPINE_CAMERAS, ViewType.AGENT_DAILY_COLLECTIONS, ViewType.AGENT_ASSISTED_SESSION
   ];

@@ -698,7 +698,7 @@ export const PROFILE_TRADER_ACTIVE: TraderProfile = {
     location: 'Lagos, Nigeria',
     kycStatus: 'Verified',
     creditScore: 720,
-    walletBalance: 12500,
+    walletBalance: 503780,
     activeLoan: null,
     esusuGroups: ESUSU_GROUPS,
     savingsPlans: [

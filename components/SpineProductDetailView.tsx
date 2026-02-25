@@ -178,7 +178,7 @@ export const SpineProductDetailView: React.FC<SpineProductDetailViewProps> = ({ 
 
       <div className="fixed bottom-0 left-0 right-0 p-4 bg-white dark:bg-slate-900 border-t border-slate-100 dark:border-slate-800 z-50">
         <button 
-          onClick={() => onNavigate(ViewType.SPINE_ADD_PRODUCT, product.id)}
+          onClick={() => onNavigate(ViewType.SPINE_ADD_STOCK, product.id)}
           className="w-full py-4 bg-blue-600 text-white font-black uppercase tracking-widest rounded-2xl shadow-lg shadow-blue-500/20 active:scale-[0.98] transition-transform flex items-center justify-center gap-2"
         >
           <Icon name="add_shopping_cart" />

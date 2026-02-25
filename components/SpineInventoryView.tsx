@@ -82,9 +82,18 @@ export const SpineInventoryView: React.FC<SpineInventoryViewProps> = ({ products
           <Icon name="arrow_back" className="text-2xl" />
         </button>
         <h1 className="text-lg font-bold text-slate-800 dark:text-white truncate flex-1">My Stock</h1>
-        <button onClick={() => onNavigate(ViewType.SPINE_ADD_PRODUCT)} className="size-10 rounded-full bg-primary text-white flex items-center justify-center shadow-lg active:scale-90 transition-transform">
-          <Icon name="add" />
-        </button>
+        <div className="flex items-center gap-2">
+          <button 
+            onClick={() => onNavigate(ViewType.SPINE_ADD_STOCK)} 
+            className="px-4 py-2 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-[10px] font-black uppercase tracking-widest flex items-center gap-2 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
+          >
+            <Icon name="add_shopping_cart" className="text-sm" />
+            <span>Restock</span>
+          </button>
+          <button onClick={() => onNavigate(ViewType.SPINE_ADD_PRODUCT)} className="size-10 rounded-full bg-primary text-white flex items-center justify-center shadow-lg active:scale-90 transition-transform">
+            <Icon name="add" />
+          </button>
+        </div>
       </header>
 
       <div className="flex-1 overflow-y-auto pb-10">

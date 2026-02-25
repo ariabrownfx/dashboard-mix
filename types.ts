@@ -205,6 +205,7 @@ export enum ViewType {
   SPINE_STOCK_TRANSFER = 'SpineStockTransfer',
   SPINE_DEBT_CENTER = 'SpineDebtCenter',
   SPINE_ADJUST_STOCK = 'SpineAdjustStock',
+  SPINE_ADD_STOCK = 'SpineAddStock',
   SPINE_SLASH_ORDERS = 'SpineSlashOrders',
   SPINE_CAMERAS = 'SpineCameras',
 

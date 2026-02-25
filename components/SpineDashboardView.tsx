@@ -267,7 +267,7 @@ export const SpineDashboardView: React.FC<SpineDashboardViewProps> = ({
           <div className="size-14 rounded-full bg-white/20 flex items-center justify-center mb-3"><Icon name="shopping_basket" className="text-3xl" /></div>
           <span className="font-bold text-lg">Sell Item</span>
         </button>
-        <button onClick={() => onNavigate(ViewType.SPINE_ADD_PRODUCT)} className="flex flex-col items-center justify-center p-6 bg-blue-600 rounded-3xl text-white shadow-lg shadow-blue-500/20 active:scale-[0.98] transition-all hover:brightness-105">
+        <button onClick={() => onNavigate(ViewType.SPINE_ADD_STOCK)} className="flex flex-col items-center justify-center p-6 bg-blue-600 rounded-3xl text-white shadow-lg shadow-blue-500/20 active:scale-[0.98] transition-all hover:brightness-105">
           <div className="size-14 rounded-full bg-white/20 flex items-center justify-center mb-3"><Icon name="add_shopping_cart" className="text-3xl" /></div>
           <span className="font-bold text-lg">Add Stock</span>
         </button>
@@ -360,7 +360,7 @@ export const SpineDashboardView: React.FC<SpineDashboardViewProps> = ({
                   <p className="text-[10px] font-black text-rose-500 uppercase tracking-widest mt-0.5">Sold Out</p>
                 </div>
                 <button 
-                  onClick={() => onNavigate(ViewType.SPINE_ADD_PRODUCT, item.id)}
+                  onClick={() => onNavigate(ViewType.SPINE_ADD_STOCK, item.id)}
                   className="px-4 py-2 bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-[10px] font-black uppercase tracking-widest rounded-xl shadow-sm"
                 >
                   Restock
@@ -374,7 +374,7 @@ export const SpineDashboardView: React.FC<SpineDashboardViewProps> = ({
                   <p className="text-[10px] font-black text-amber-500 uppercase tracking-widest mt-0.5">Low: {item.pieceQuantity} {item.pieceUnitName}s</p>
                 </div>
                 <button 
-                  onClick={() => onNavigate(ViewType.SPINE_ADD_PRODUCT, item.id)}
+                  onClick={() => onNavigate(ViewType.SPINE_ADD_STOCK, item.id)}
                   className="px-4 py-2 bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 text-[10px] font-black uppercase tracking-widest rounded-xl"
                 >
                   Restock
